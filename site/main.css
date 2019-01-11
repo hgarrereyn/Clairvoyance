@@ -1,0 +1,117 @@
+
+body {
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+}
+
+#game {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+#controls {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 500px;
+    bottom: 0px;
+
+    padding: 30px;
+
+    border-left: 2px solid lightcyan;
+    background-color: rgba(255,255,255,0.9);
+    overflow-y: scroll;
+}
+
+span.dyn_val {
+    font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Roboto', sans-serif;
+}
+
+p.no-margin {
+    margin: 0px;
+}
+
+.pad-row {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.display-panel p {
+    margin: 0px;
+}
+
+.red-team {
+    border-left: 4px solid red;
+}
+
+.blue-team {
+    border-left: 4px solid blue;
+}
+
+#tooltip {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-top: 2px solid lightcyan;
+    border-right: 2px solid lightcyan;
+    width: 200px;
+    pointer-events: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.true-val {
+    color: limegreen;
+}
+
+.red-img {
+    background-color: red;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.blue-img {
+    background-color: blue;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#unit_health_bar {
+    background-color: red;
+}
+
+#unit_fuel_bar {
+    background-color: #ffff00;
+}
+
+#unit_karbonite_bar {
+    background-color: #00ff00;
+}
+
+p.selectable {
+    border-left: 3px solid white;
+    padding-left: 10px;
+}
+
+p.selectable.red {
+    border-left-color: red;
+}
+
+p.selectable.blue {
+    border-left-color: blue;
+}
+
+p.selectable:hover {
+    cursor: pointer;
+}

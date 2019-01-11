@@ -1,0 +1,181 @@
+<html>
+    <head>
+        <title>Clairvoyance</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <link rel='stylesheet' href='/main.css'>
+    </head>
+    <body>
+        
+        <div id='game'></div>
+
+        <div id='tooltip'>
+            <div id='tooltip-unit'>
+                <div class='display-panel'>
+                    <p class='text-center'><span id='unit_type' class='dyn_val'>Castle</span> [<span id='unit_id' class='dyn_val'>0</span>]</p>
+                    <img class='img-fluid' src='' id='unit_img'/>
+
+                    <div style='height:10px;'></div>
+                    <p>Health: <span id='unit_health' class='dyn_val'>0</span>/<span id='unit_health_max' class='dyn_val'>0</span></p>
+                    <div class="progress" style='height:3px;'>
+                        <div id='unit_health_bar' class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <div id='tooltip-unit-resources'>
+                        <div style='height:10px;'></div>
+                        <p>Fuel: <span id='unit_fuel' class='dyn_val'>0</span>/<span id='unit_fuel_max' class='dyn_val'>0</span></p>
+                        <div class="progress" style='height:3px;'>
+                            <div id='unit_fuel_bar' class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+
+                        <div style='height:10px;'></div>
+                        <p>Karbonite: <span id='unit_karbonite' class='dyn_val'>0</span>/<span id='unit_karbonite_max' class='dyn_val'>0</span></p>
+                        <div class="progress" style='height:3px;'>
+                            <div id='unit_karbonite_bar' class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div style='height:10px;'></div>
+                    <p>Signal: <span id='unit_signal' class='dyn_val'>0</span></p>
+                    <p>Castletalk: <span id='unit_castle_talk' class='dyn_val'>0</span></p>
+
+                    <hr/>
+                </div>
+            </div>
+            <div id='tooltip-tile'>
+                <div class='display-panel'>
+                    <p>Location: <span id='tile_location' class='dyn_val'>(0,0)</span></p>
+                    <p>Passable: <span id='tile_passable' class='dyn_val'>true</span></p>
+                    <p>Fuel: <span id='tile_fuel' class='dyn_val'>false</span></p>
+                    <p>Karbonite: <span id='tile_karbonite' class='dyn_val'>false</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id='controls'>
+            <h2>Clairvoyance</h2>
+            <h6>unofficial bc19 replay viewer by hgarrereyn</h6>
+            <a href='/settings'>Configuration...</a>
+            <hr/>
+
+            <h3>Time Controls:</h3>
+            
+            <div class='row pad-row'>
+                <div class='col-2 align-self-center'>
+                    <p class='no-margin'>Turn:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_prev_turn' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
+                </div>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin text-center'><span id='game_curr_turn' class='dyn_val'>0</span> / <span id='game_max_turns'>0</span></p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_next_turn' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-2 align-self-center'>
+                    <p class='no-margin'>Round:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_prev_round' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
+                </div>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin text-center'><span id='game_curr_round' class='dyn_val'>0</span> / <span id='game_max_rounds'>0</span></p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_next_round' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-2 align-self-center'>
+                    <p class='no-margin'>Robin:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_prev_robin' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
+                </div>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin text-center'><span id='game_curr_robin' class='dyn_val'>0</span> / <span id='game_max_robins'>0</span></p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_next_robin' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
+                </div>
+            </div>
+
+            <hr/>
+
+            <div class='row pad-row'>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin'>Autoplay:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <button id='btn_start_autoplay' type="button" class="btn btn-primary btn-sm">Start</button>
+                    <button id='btn_stop_autoplay' type="button" class="btn btn-primary btn-sm disabled">Stop</button>
+                    <button id='btn_jump_start' type="button" class="btn btn-primary btn-sm">Reset</button>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin'>Set Turn:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
+                        <input id='input_set_turn' type="number" class="form-control" placeholder="Turn">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="btn_set_turn">Go</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-3 align-self-center'>
+                    <p class='no-margin'>Set Round:</p>
+                </div>
+                <div class='col-xs-auto'>
+                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
+                        <input id='input_set_round' type="number" class="form-control" placeholder="Round">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="btn_set_round">Go</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr/>
+
+            <h3>Resources:</h3>
+
+            <div class='row display-panel'>
+                <div class='col-6 red-team'>
+                    <p>Fuel: <span id='game_red_fuel' class='dyn_val'>0</span></p>
+                    <p>Karbonite: <span id='game_red_karbonite' class='dyn_val'>0</span></p>
+                </div>
+                <div class='col-6 blue-team'>
+                    <p>Fuel: <span id='game_blue_fuel' class='dyn_val'>0</span></p>
+                    <p>Karbonite: <span id='game_blue_karbonite' class='dyn_val'>0</span></p>
+                </div>
+            </div>
+
+            <hr/>
+
+            <h3>Turn Queue:</h3>
+
+            <div class='display-panel' id='turn_queue'>
+                <p class='selectable'>1: Castle [#1234]</a>
+                <p class='selectable'>2: Castle [#1234]</p>
+                <p class='selectable'>3: Castle [#1234]</p>
+            </div>
+
+        </div>
+
+        <!-- Canvas drawing library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+        <script src='/socket.io.slim.js'></script>
+        <script src='/main.js'></script>
+    </body>
+</html>
