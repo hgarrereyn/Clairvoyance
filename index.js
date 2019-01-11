@@ -7,6 +7,15 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const port = 8123;
 
+const updateNotifier = require('update-notifier');
+const pkg = require('bc19/package.json');
+
+// notify users for bc19 updates
+updateNotifier({
+    pkg,
+    updateCheckInterval:1000*20
+}).notify();
+
 app.get('/main.js', expressBrowserify('./site/main.js'));
 app.use(express.static('./site'));
 
@@ -53,7 +62,7 @@ app.get('/set_replay', function(req, res) {
 });
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log('Got connection');
 });
 
-http.listen(port, () => console.log(`Example app listening on port ${port}!`))
+http.listen(port, () => console.log(`Running on port ${port}!`))

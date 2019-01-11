@@ -40,6 +40,7 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * see the order that robots will run
 * Stats
     * view fuel and karbonite per team
+* Yells at you if the `bc19` package is outdated
 
 # Ideas? Problems?
 
