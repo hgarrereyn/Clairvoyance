@@ -52,6 +52,13 @@ class Veww {
         // checkpoints is of the type [(int) turn, (Game) checkpoint]
         // checkpoints[i] is the round i
         this.checkpoints = [[0, this.game.copy()]];
+
+        // check if we ran into that bug
+        if (this.checkpoints[0][1].robots.length == 0) {
+            alert('Error during map creation, try using Firefox.');
+            return;
+        }
+
         this.create_checkpoints();
 
         // game variables

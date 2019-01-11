@@ -12,6 +12,10 @@ An unofficial, offline replay viewer for Battlecode 2019
 4. Run `node index.js` to launch the server
 5. Navigate to `http://localhost:8123`
 
+# Note
+
+Since Clairvoyance uses the bc19 internal api, it is buggy in the same way as the official viewer. Therefore, you may need to use Firefox in order to view certain replays.
+
 # About
 
 Clairvoyance is composed of a NodeJS/express backend and a mostly JavaScript frontend.
