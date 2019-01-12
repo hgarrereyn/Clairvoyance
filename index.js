@@ -7,14 +7,34 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const port = 8123;
 
-const updateNotifier = require('update-notifier');
+var npm = new require('npm-api')();
 const pkg = require('bc19/package.json');
 
-// notify users for bc19 updates
-updateNotifier({
-    pkg,
-    updateCheckInterval:1000*20
-}).notify();
+var versions = {
+    curr: pkg.version,
+    newest: ''
+};
+
+console.log('BC19 Version: ' + versions.curr);
+
+function check_bc19_update() {
+    console.log('Checking for bc19 update');
+    var repo = npm.repo('bc19');
+    repo.package().then(function(pkg) {
+        var version = pkg.version;
+        console.log('newest version is: ' + version);
+        versions.newest = version;
+    }, function(err) {
+        console.log('Error looking up bc19 information.')
+        console.log('bc19 may be outdated');
+    });
+}
+
+setInterval(function(){
+    check_bc19_update();
+}, 1000 * 60);
+
+newest_bc19_version = check_bc19_update();
 
 app.get('/main.js', expressBrowserify('./site/main.js'));
 app.use(express.static('./site'));
@@ -61,8 +81,10 @@ app.get('/set_replay', function(req, res) {
     }
 });
 
-io.on('connection', function(socket){
-    console.log('Got connection');
+app.get('/version', function(req, res) {
+    res.send(JSON.stringify(versions));
 });
+
+io.on('connection', function(socket){ });
 
 http.listen(port, () => console.log(`Running on port ${port}!`))

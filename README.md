@@ -9,8 +9,9 @@ An unofficial, offline replay viewer for Battlecode 2019
 1. Clone this repository
 2. `cd` into it
 3. Run `npm install` to install dependencies
-4. Run `node index.js` to launch the server
-5. Navigate to `http://localhost:8123`
+4. Run `npm i bc19` to update to the latest version of bc19
+5. Run `node index.js` to launch the server
+6. Navigate to `http://localhost:8123`
 
 # Note
 

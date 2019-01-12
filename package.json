@@ -8,9 +8,10 @@
   },
   "author": "hgarrereyn",
   "dependencies": {
-    "bc19": "^0.3.15",
+    "bc19": "^0.3.16",
     "express": "^4.16.4",
     "express-browserify": "^1.0.2",
+    "npm-api": "^0.4.12",
     "socket.io": "^2.2.0",
     "update-notifier": "^2.5.0"
   }

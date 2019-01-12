@@ -36,6 +36,25 @@ Tank by Sandhi Priyasmoro from the Noun Project
 class Veww {
     process_replay(replay) {
         console.log('process');
+
+        // check for bc19 update
+        fetch('/version').then(function(resp) {
+            resp.text().then(function(t) {
+                console.log(t);
+
+                var versions = JSON.parse(t);
+
+                console.log(versions);
+
+                if (versions['curr'] == versions['newest']) {
+                    document.getElementById('bc19_version').innerText = versions['curr'] + ' (up to date)';
+                    document.getElementById('bc19_update_tips').classList.add('hidden');
+                } else {
+                    document.getElementById('bc19_version').innerText = versions['curr'] + ' (newest is: ' + versions['newest'] + ')';
+                    document.getElementById('bc19_update_tips').classList.remove('hidden');
+                }
+            })
+        });
         
         this.replay = new Uint8Array(replay);
 
