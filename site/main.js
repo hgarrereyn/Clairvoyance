@@ -94,6 +94,7 @@ class Veww {
 
         // viewer state
         this.is_playing = false;
+        this.autoplay_delay = 20;
         this.hover_coordinate = [-1,-1];
         this.size = this.current_game.map.length;
 
@@ -196,6 +197,15 @@ class Veww {
         }
     }
 
+    next_turn_norender() {
+        // cancel autoplay if we reach the end
+        if (this.current_turn >= this.max_turns && this.is_playing) {
+            this.stop_autoplay();
+        } else {
+            this.jump_to_turn(this.current_turn + 1);
+        }
+    }
+
     next_turn() {
         // cancel autoplay if we reach the end
         if (this.current_turn >= this.max_turns && this.is_playing) {
@@ -221,6 +231,28 @@ class Veww {
         this.render();
     }
 
+    // This could be integrated into the Pixi loop I guess.
+    render_autoplay_frame(curr_time) {
+        if (this.last_turn_time == null) {
+            this.last_turn_time = curr_time;
+            this.anim_frame = requestAnimationFrame(this.render_autoplay_frame.bind(this));
+            return;
+        }
+
+        while (curr_time > this.last_turn_time + this.autoplay_delay) {
+            this.last_turn_time += this.autoplay_delay;
+            this.next_turn_norender();
+        }
+
+        this.render();
+
+        if (this.current_turn < this.max_turns) {
+            this.anim_frame = requestAnimationFrame(this.render_autoplay_frame.bind(this));
+        } else {
+            this.stop_autoplay();
+        }
+    }
+
     start_autoplay() {
         if (this.is_playing) return;
         this.is_playing = true;
@@ -238,16 +270,16 @@ class Veww {
         document.getElementById('btn_stop_autoplay').classList.remove('disabled')
         document.getElementById('btn_jump_start').classList.add('disabled')
 
-        this.timer = setInterval(function(){
-            this.next_turn();
-        }.bind(this), 20);
+        // Simple function to play at arbitrary speed
+        this.last_turn_time = null;
+        this.anim_frame = requestAnimationFrame(this.render_autoplay_frame.bind(this));
     }
 
     stop_autoplay() {
         if (!this.is_playing) return;
         this.is_playing = false;
 
-        clearInterval(this.timer);
+        cancelAnimationFrame(this.anim_frame);
 
         // enable manual buttons
         document.getElementById('btn_next_turn').classList.remove('disabled')
@@ -365,7 +397,7 @@ class Veww {
             var px = event.x - this.grid.position.x;
             var py = event.y - this.grid.position.y;
 
-            var zoom_amount = Math.pow(3/4, event.deltaY / 120);
+            var zoom_amount = Math.pow(3/4, event.deltaY / 10);
 
             this.grid.scale.x *= zoom_amount;
             this.grid.scale.y *= zoom_amount;
@@ -669,4 +701,9 @@ document.getElementById('btn_set_round').onclick = function(){
         veww.jump_to_round_robin(round, 1);
         veww.render();
     }
+}
+
+// add slider listener
+document.getElementById('input_set_speed').oninput = function() {
+    veww.autoplay_delay = 1000 / parseInt(this.value);
 }
