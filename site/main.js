@@ -97,6 +97,8 @@ class Veww {
         this.hover_coordinate = [-1,-1];
         this.size = this.current_game.map.length;
 
+        // draw the grid once
+        this.draw_grid();
         this.render();
     }
 
@@ -279,8 +281,20 @@ class Veww {
         this.app.stage.addChild(this.grid);
 
         // initialize graphics object
+        this.background = new PIXI.Graphics();
+        this.background.beginFill(0xffffff);
+        this.background.drawRect(-1000,-1000,(GRID_SIZE+GRID_SPACING)*this.size+1000,(GRID_SIZE+GRID_SPACING)*this.size+1000);
+        this.background.endFill();
+        this.grid.addChild(this.background);
+
+        this.dyn_graphics = new PIXI.Graphics();
+        this.grid.addChild(this.dyn_graphics);
+
         this.graphics = new PIXI.Graphics();
         this.grid.addChild(this.graphics);
+
+        this.unit_health = new PIXI.Graphics();
+        this.grid.addChild(this.unit_health);
 
         // initialize textures
         this.textures = Array(6);
@@ -373,34 +387,15 @@ class Veww {
             this.grid.position.x -= (px * (zoom_amount - 1));
             this.grid.position.y -= (py * (zoom_amount - 1));
         }.bind(this));
-        
     }
 
-    /**
-     * Renders the game to the canvas
-     */
-    render() {
-        if (this.current_game == undefined) return;
-
-        // clear the graphics so we can redraw
+    // we can do this just once per game
+    draw_grid() {
         this.graphics.clear();
-
-        // render a background so we can drag without issues
-        this.graphics.beginFill(0xffffff);
-        this.graphics.drawRect(-1000,-1000,(GRID_SIZE+GRID_SPACING)*this.size+1000,(GRID_SIZE+GRID_SPACING)*this.size+1000);
-        this.graphics.endFill();
 
         // render tiles
         for (var y = 0; y < this.size; ++y) {
             for (var x = 0; x < this.size; ++x) {
-
-                if (y == this.hover_coordinate[1] && x == this.hover_coordinate[0]) {
-                    this.graphics.beginFill(0xff0000);
-                    var gx = x * (GRID_SIZE + GRID_SPACING);
-                    var gy = y * (GRID_SIZE + GRID_SPACING);
-                    this.graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
-                    this.graphics.endFill();
-                }
 
                 // determine tile color
                 if (this.current_game.karbonite_map[y][x]) {
@@ -422,6 +417,27 @@ class Veww {
                 this.graphics.endFill();
             }
         }
+    }
+
+    /**
+     * Renders the game to the canvas
+     */
+    render() {
+        if (this.current_game == undefined) return;
+
+        // clear the graphics so we can redraw
+        this.dyn_graphics.clear();
+        this.unit_health.clear();
+
+        // hover coordinate
+        var x = this.hover_coordinate[0];
+        var y = this.hover_coordinate[1];
+
+        this.dyn_graphics.beginFill(0x9e42f4);
+        var gx = x * (GRID_SIZE + GRID_SPACING);
+        var gy = y * (GRID_SIZE + GRID_SPACING);
+        this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
+        this.dyn_graphics.endFill();
 
         // hide all units
         for (var i = 0; i < 6; ++i) {
@@ -456,6 +472,21 @@ class Veww {
             sprite.position = new PIXI.Point(gx, gy);
             sprite.tint = robot.team === 0 ? 0xFF0000 : 0x0000FF;
 
+            // display robot health in tile border
+            var health_percentage = robot.health / SPECS.UNITS[robot.unit].STARTING_HP;
+
+            if (health_percentage < 1) {
+                // make space
+                sprite.width = GRID_SIZE * 0.8;
+                sprite.height = GRID_SIZE * 0.8;
+                sprite.position = new PIXI.Point(gx + (GRID_SIZE * 0.1), gy);
+
+                this.unit_health.beginFill(0xff0000);
+                var gx = robot.x * (GRID_SIZE + GRID_SPACING);
+                var gy = robot.y * (GRID_SIZE + GRID_SPACING);
+                this.unit_health.drawRect(gx,gy+(GRID_SIZE * 0.8),(GRID_SIZE * health_percentage),GRID_SIZE * 0.2);
+                this.unit_health.endFill();
+            }
         }
 
         this.write_stats();
