@@ -4,6 +4,7 @@
  */
 var Game = require('bc19/game')
 var SPECS = require('bc19/specs');
+var ActionRecord = require('bc19/action_record');
 
 var UNIT_NAMES = [
     'Castle',
@@ -82,6 +83,7 @@ class Veww {
 
         // game variables
         this.current_game = this.checkpoints[0][1];
+        this.round_start_game = this.checkpoints[0][1];
         this.current_turn = 0;
         this.current_round = 0;
         this.current_robin = 0;
@@ -491,6 +493,41 @@ class Veww {
 
         this.write_stats();
         this.write_tooltip();
+        this.render_action();
+    }
+
+    // show what action is currently being done
+    render_action() {
+        // get current diff
+        if (this.current_turn == 0) return;
+
+        var i = this.current_turn - 1;
+        var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
+        
+        var move = ActionRecord.FromBytes(diff);
+        var robot = this.current_game.robots[this.current_robin - 1];
+
+        var gx = robot.x * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+        var gy = robot.y * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+
+        if (move.action == 1) {
+            // move
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0x333333, 1);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx - (move.dx * (GRID_SIZE + GRID_SPACING)), gy - (move.dy * (GRID_SIZE + GRID_SPACING)))
+        } else if (move.action == 2) {
+            // attack
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0xff0000, 1);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx + (move.dx * (GRID_SIZE + GRID_SPACING)), gy + (move.dy * (GRID_SIZE + GRID_SPACING)))
+        } else if (move.action == 3) {
+            // build
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0x00ff00, 1);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx + (move.dx * (GRID_SIZE + GRID_SPACING)), gy + (move.dy * (GRID_SIZE + GRID_SPACING)))
+        }
+
+        console.log(move);
     }
 
     /**
