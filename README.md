@@ -38,6 +38,7 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * step forward or backwards by turn/round/robin
     * jump to a specific turn or round
     * click a button to auto-run the replay
+        * with speed control (thanks to ChiCubed)
 * Tooltip information on gridpoint hover
     * shows tile information
     * shows unit information (when applicable)
