@@ -397,7 +397,7 @@ class Veww {
             var px = event.x - this.grid.position.x;
             var py = event.y - this.grid.position.y;
 
-            var zoom_amount = Math.pow(3/4, event.deltaY / 10);
+            var zoom_amount = Math.pow(3/4, event.deltaY / 120);
 
             this.grid.scale.x *= zoom_amount;
             this.grid.scale.y *= zoom_amount;
