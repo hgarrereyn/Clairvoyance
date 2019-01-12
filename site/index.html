@@ -68,13 +68,13 @@
                 <div class='col-2 align-self-center'>
                     <p class='no-margin'>Turn:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_prev_turn' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
                 <div class='col-3 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_turn' class='dyn_val'>0</span> / <span id='game_max_turns'>0</span></p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_next_turn' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
                 </div>
             </div>
@@ -83,13 +83,13 @@
                 <div class='col-2 align-self-center'>
                     <p class='no-margin'>Round:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_prev_round' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
                 <div class='col-3 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_round' class='dyn_val'>0</span> / <span id='game_max_rounds'>0</span></p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_next_round' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
                 </div>
             </div>
@@ -98,13 +98,13 @@
                 <div class='col-2 align-self-center'>
                     <p class='no-margin'>Robin:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_prev_robin' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
                 <div class='col-3 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_robin' class='dyn_val'>0</span> / <span id='game_max_robins'>0</span></p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_next_robin' type="button" class="btn btn-primary btn-sm">Next &gt;</button>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                 <div class='col-3 align-self-center'>
                     <p class='no-margin'>Autoplay:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-auto'>
                     <button id='btn_start_autoplay' type="button" class="btn btn-primary btn-sm">Start</button>
                     <button id='btn_stop_autoplay' type="button" class="btn btn-primary btn-sm disabled">Stop</button>
                     <button id='btn_jump_start' type="button" class="btn btn-primary btn-sm">Reset</button>
@@ -124,9 +124,20 @@
 
             <div class='row pad-row'>
                 <div class='col-3 align-self-center'>
+                    <p class='no-margin'>Speed:</p>
+                </div>
+                <div class='col-7'>
+                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
+                        <input id='input_set_speed' type="range" min="1" max="100" value="50" class="form-control-range">
+                    </div>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-3 align-self-center'>
                     <p class='no-margin'>Set Turn:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-7'>
                     <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
                         <input id='input_set_turn' type="number" class="form-control" placeholder="Turn">
                         <div class="input-group-append">
@@ -140,7 +151,7 @@
                 <div class='col-3 align-self-center'>
                     <p class='no-margin'>Set Round:</p>
                 </div>
-                <div class='col-xs-auto'>
+                <div class='col-7'>
                     <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
                         <input id='input_set_round' type="number" class="form-control" placeholder="Round">
                         <div class="input-group-append">

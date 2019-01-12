@@ -26,6 +26,90 @@ body {
     overflow-y: scroll;
 }
 
+input[type=range] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    height: 1.5em;
+}
+
+/* remove outline on selection */
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-moz-focus-outer {
+    border: 0;
+}
+
+/* NOTE: No webkit support. So Chrome / Safari users don't get their beautiful blue filled-in ranges. :( */
+input[type=range]::-moz-range-progress {
+    -moz-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: #007bff;
+}
+
+input[type=range]::-ms-fill-lower {
+    appearance: none;
+    height: 3px;
+    background: #007bff;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: lightgrey;
+}
+
+input[type=range]::-moz-range-track {
+    -moz-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: lightgrey;
+}
+
+input[type=range]::-ms-track {
+    appearance: none;
+    height: 3px;
+    background: lightgrey;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background: white;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+input[type=range]::-moz-range-thumb {
+    -moz-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background: white;
+    cursor: pointer;
+}
+
+input[type=range]::-ms-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background: white;
+    cursor: pointer;
+}
+
+
 span.dyn_val {
     font-weight: bold;
 }
