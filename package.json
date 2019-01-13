@@ -9,8 +9,9 @@
   "author": "hgarrereyn",
   "dependencies": {
     "bc19": "^0.3.16",
+    "browserify": "^16.2.3",
     "express": "^4.16.4",
-    "express-browserify": "^1.0.2",
+    "npm": "^6.5.0",
     "npm-api": "^0.4.12",
     "socket.io": "^2.2.0",
     "update-notifier": "^2.5.0"

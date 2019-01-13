@@ -1,42 +1,42 @@
 
 const fs = require('fs')
 const express = require('express');
-const expressBrowserify = require('express-browserify');
 const app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const port = 8123;
 
-var npm = new require('npm-api')();
-const pkg = require('bc19/package.json');
+const npm = require('npm');
+const browserify = require('browserify');
+
+var pkg = require('bc19/package');
 
 var versions = {
     curr: pkg.version,
-    newest: ''
+    newest: '',
+    available: []
 };
 
 console.log('BC19 Version: ' + versions.curr);
 
-function check_bc19_update() {
-    console.log('Checking for bc19 update');
-    var repo = npm.repo('bc19');
-    repo.package().then(function(pkg) {
-        var version = pkg.version;
-        console.log('newest version is: ' + version);
-        versions.newest = version;
-    }, function(err) {
-        console.log('Error looking up bc19 information.')
-        console.log('bc19 may be outdated');
+npm.load(function(err) {
+    npm.commands.view(['bc19', 'versions'], function(er, data){
+        var n = Object.keys(data)[0];
+        versions.newest = n;
+        versions.available = data[n]['versions'].reverse();
+
+        console.log('Newest: ' + versions.newest);
     });
-}
+});
 
-setInterval(function(){
-    check_bc19_update();
-}, 1000 * 60);
+app.get('/main.js', function(req, res) {
+    var b = browserify();
+    b.add('./site/main.js');
+    b.bundle(function(err, buf) {
+        res.type('text/javascript').send(buf);
+    });
+});
 
-newest_bc19_version = check_bc19_update();
-
-app.get('/main.js', expressBrowserify('./site/main.js'));
 app.use(express.static('./site'));
 
 var file_path = '';
@@ -85,6 +85,28 @@ app.get('/version', function(req, res) {
     res.send(JSON.stringify(versions));
 });
 
+app.get('/set_version', function(req, res) {
+    var version = req.url.split('?')[1];
+
+    console.log('switching to version: ' + version);
+
+    npm.load(function(err) {
+        npm.commands.install(['bc19@' + version], function(er, data){
+            if (er) {
+                res.sendStatus(404);
+            } else {
+                delete require.cache[require.resolve('bc19/package')]
+
+                var pkg = require('bc19/package');
+                versions.curr = pkg.version;
+                
+                res.sendStatus(200);
+            }
+        });
+    });
+});
+
 io.on('connection', function(socket){ });
 
 http.listen(port, () => console.log(`Running on port ${port}!`))
+

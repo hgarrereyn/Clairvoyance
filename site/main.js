@@ -4,6 +4,7 @@
  */
 var Game = require('bc19/game')
 var SPECS = require('bc19/specs');
+var ActionRecord = require('bc19/action_record');
 
 var UNIT_NAMES = [
     'Castle',
@@ -46,13 +47,19 @@ class Veww {
 
                 console.log(versions);
 
-                if (versions['curr'] == versions['newest']) {
-                    document.getElementById('bc19_version').innerText = versions['curr'] + ' (up to date)';
-                    document.getElementById('bc19_update_tips').classList.add('hidden');
-                } else {
-                    document.getElementById('bc19_version').innerText = versions['curr'] + ' (newest is: ' + versions['newest'] + ')';
-                    document.getElementById('bc19_update_tips').classList.remove('hidden');
+                // list versions
+                var options = '';
+                for (var i = 0; i < versions['available'].length; ++i) {
+                    if (versions['available'][i] == versions['curr']) {
+                        options += `<option selected value="${versions['available'][i]}">${versions['available'][i]}</option>`;
+                    } else {
+                        options += `<option value="${versions['available'][i]}">${versions['available'][i]}</option>`;
+                    }
                 }
+
+                document.getElementById('select_bc19_version').innerHTML = options;
+                document.getElementById('bc19_installed_version').innerText = versions['curr'];
+                document.getElementById('bc19_newest_version').innerText = versions['newest'];
             })
         });
         
@@ -82,6 +89,7 @@ class Veww {
 
         // game variables
         this.current_game = this.checkpoints[0][1];
+        this.round_bots = []; // list of type (bot, is_dead, had_turn), cleared every round
         this.current_turn = 0;
         this.current_round = 0;
         this.current_robin = 0;
@@ -98,6 +106,10 @@ class Veww {
         this.hover_coordinate = [-1,-1];
         this.size = this.current_game.map.length;
 
+        // draw the grid once
+        this.draw_grid();
+
+        this.jump_to_turn(0);
         this.render();
     }
 
@@ -116,13 +128,11 @@ class Veww {
         this.robin_per_round = [0];
 
         for (var i = 0; i < this.max_turns; ++i) {
-            // check if we have ended the round
-            if (robin >= checkpoint.robots.length) {
-                // store a new checkpoint
-                // process the turn
-                var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
-                checkpoint.enactTurn(diff);
 
+            var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
+            checkpoint.enactTurn(diff);
+
+            if (checkpoint.robin == 1) {
                 this.checkpoints.push([i+1, checkpoint.copy()]);
 
                 // keep track of how many robots there were
@@ -131,10 +141,6 @@ class Veww {
                 // reset robin
                 robin = 1;
             } else {
-                // process the turn
-                var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
-                checkpoint.enactTurn(diff);
-
                 robin++;
             }
         }
@@ -152,6 +158,12 @@ class Veww {
             this.current_turn = 0;
             this.current_round = 0;
             this.current_robin = 0;
+            
+            this.round_bots = []
+            for (var i = 0; i < this.current_game.robots.length; ++i) {
+                this.round_bots.push([this.current_game.robots[i], false, true]);
+            }
+
             return;
         }
 
@@ -163,6 +175,41 @@ class Veww {
         // load the round
         var checkpoint = this.checkpoints[round][1].copy();
         var robin = 0;
+
+        // track dead robots
+        this.round_bots = [];
+        for (var i = 0; i < checkpoint.robots.length; ++i) {
+            this.round_bots.push([checkpoint.robots[i], false, true]);
+        }
+
+        // hijack the _deleteRobot method to track dead robots
+        checkpoint._old_delete = checkpoint._deleteRobot;
+        checkpoint._deleteRobot = function(checkpoint, veww) {
+            return function(robot) {
+                console.log(robot.id);
+
+                for (var i = 0; i < veww.round_bots.length; ++i) {
+                    if (veww.round_bots[i][0].id == robot.id) {
+                        veww.round_bots[i][1] = true;
+
+                        if (i > checkpoint.robin) {
+                            veww.round_bots[i][2] = false;
+                        }
+                    }
+                }
+
+                checkpoint._old_delete(robot);
+            }
+        }(checkpoint, this);
+
+        // hijack the createItem method to track new robots
+        checkpoint._old_createItem = checkpoint.createItem;
+        checkpoint.createItem = function(checkpoint, veww) {
+            return function(x,y,team,unit) {
+                var robot = checkpoint._old_createItem(x,y,team,unit);
+                veww.round_bots.push([robot, false, false]);
+            }
+        }(checkpoint, this);
 
         // process turns until we reach our goal
         for (var i = this.checkpoints[round][0]; i < turn; ++i) {
@@ -311,8 +358,20 @@ class Veww {
         this.app.stage.addChild(this.grid);
 
         // initialize graphics object
+        this.background = new PIXI.Graphics();
+        this.background.beginFill(0xffffff);
+        this.background.drawRect(-1000,-1000,(GRID_SIZE+GRID_SPACING)*this.size+1000,(GRID_SIZE+GRID_SPACING)*this.size+1000);
+        this.background.endFill();
+        this.grid.addChild(this.background);
+
+        this.dyn_graphics = new PIXI.Graphics();
+        this.grid.addChild(this.dyn_graphics);
+
         this.graphics = new PIXI.Graphics();
         this.grid.addChild(this.graphics);
+
+        this.unit_health = new PIXI.Graphics();
+        this.grid.addChild(this.unit_health);
 
         // initialize textures
         this.textures = Array(6);
@@ -397,7 +456,7 @@ class Veww {
             var px = event.x - this.grid.position.x;
             var py = event.y - this.grid.position.y;
 
-            var zoom_amount = Math.pow(3/4, event.deltaY / 10);
+            var zoom_amount = Math.pow(3/4, event.deltaY / 120);
 
             this.grid.scale.x *= zoom_amount;
             this.grid.scale.y *= zoom_amount;
@@ -405,34 +464,15 @@ class Veww {
             this.grid.position.x -= (px * (zoom_amount - 1));
             this.grid.position.y -= (py * (zoom_amount - 1));
         }.bind(this));
-        
     }
 
-    /**
-     * Renders the game to the canvas
-     */
-    render() {
-        if (this.current_game == undefined) return;
-
-        // clear the graphics so we can redraw
+    // we can do this just once per game
+    draw_grid() {
         this.graphics.clear();
-
-        // render a background so we can drag without issues
-        this.graphics.beginFill(0xffffff);
-        this.graphics.drawRect(-1000,-1000,(GRID_SIZE+GRID_SPACING)*this.size+1000,(GRID_SIZE+GRID_SPACING)*this.size+1000);
-        this.graphics.endFill();
 
         // render tiles
         for (var y = 0; y < this.size; ++y) {
             for (var x = 0; x < this.size; ++x) {
-
-                if (y == this.hover_coordinate[1] && x == this.hover_coordinate[0]) {
-                    this.graphics.beginFill(0xff0000);
-                    var gx = x * (GRID_SIZE + GRID_SPACING);
-                    var gy = y * (GRID_SIZE + GRID_SPACING);
-                    this.graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
-                    this.graphics.endFill();
-                }
 
                 // determine tile color
                 if (this.current_game.karbonite_map[y][x]) {
@@ -454,6 +494,27 @@ class Veww {
                 this.graphics.endFill();
             }
         }
+    }
+
+    /**
+     * Renders the game to the canvas
+     */
+    render() {
+        if (this.current_game == undefined) return;
+
+        // clear the graphics so we can redraw
+        this.dyn_graphics.clear();
+        this.unit_health.clear();
+
+        // hover coordinate
+        var x = this.hover_coordinate[0];
+        var y = this.hover_coordinate[1];
+
+        this.dyn_graphics.beginFill(0x9e42f4);
+        var gx = x * (GRID_SIZE + GRID_SPACING);
+        var gy = y * (GRID_SIZE + GRID_SPACING);
+        this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
+        this.dyn_graphics.endFill();
 
         // hide all units
         for (var i = 0; i < 6; ++i) {
@@ -466,8 +527,9 @@ class Veww {
         for (var i = 0; i < 6; ++i) sprite_index[i] = 0;
 
         // render units
-        for (var i = 0; i < this.current_game.robots.length; ++i) {
-            var robot = this.current_game.robots[i];
+        for (var i = 0; i < this.round_bots.length; ++i) {
+            var robot = this.round_bots[i][0];
+            var is_dead = this.round_bots[i][1];
 
             // check if we have enough sprites
             if (sprite_index[robot.unit] >= MAX_SPRITES_PER_TYPE) {
@@ -488,10 +550,82 @@ class Veww {
             sprite.position = new PIXI.Point(gx, gy);
             sprite.tint = robot.team === 0 ? 0xFF0000 : 0x0000FF;
 
+            if (is_dead) {
+                sprite.alpha = 0.5;
+            } else {
+                sprite.alpha = 1;
+            }
+
+            // display robot health in tile border
+            var health_percentage = robot.health / SPECS.UNITS[robot.unit].STARTING_HP;
+
+            if (health_percentage < 1) {
+                // make space
+                sprite.width = GRID_SIZE * 0.8;
+                sprite.height = GRID_SIZE * 0.8;
+                sprite.position = new PIXI.Point(gx + (GRID_SIZE * 0.1), gy);
+
+                this.unit_health.beginFill(0xff0000);
+                var gx = robot.x * (GRID_SIZE + GRID_SPACING);
+                var gy = robot.y * (GRID_SIZE + GRID_SPACING);
+                this.unit_health.drawRect(gx,gy+(GRID_SIZE * 0.8),(GRID_SIZE * health_percentage),GRID_SIZE * 0.2);
+                this.unit_health.endFill();
+            }
         }
 
         this.write_stats();
         this.write_tooltip();
+        this.render_action();
+    }
+
+    // show what action is currently being done
+    render_action() {
+        // get current diff
+        if (this.current_turn == 0) return;
+
+        var i = this.current_turn - 1;
+        var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
+        
+        var move = ActionRecord.FromBytes(diff);
+        
+        // find the robot for turn (robin-1)
+        var robot_idx = 0;
+        var i = 0;
+        while (i < this.current_robin - 1) {
+            if (robot_idx == this.round_bots.length) {
+                return;
+            }
+
+            // if the robot had a turn, count it
+            if (this.round_bots[robot_idx][2]) {
+                i++;
+            }
+            // otherwise skip it
+
+            robot_idx++;
+        }
+
+        var robot = this.round_bots[robot_idx][0];
+
+        var gx = robot.x * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+        var gy = robot.y * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+
+        if (move.action == 1) {
+            // move
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0x333333, 0.5);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx - (move.dx * (GRID_SIZE + GRID_SPACING)), gy - (move.dy * (GRID_SIZE + GRID_SPACING)))
+        } else if (move.action == 2) {
+            // attack
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0xff0000, 0.5);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx + (move.dx * (GRID_SIZE + GRID_SPACING)), gy + (move.dy * (GRID_SIZE + GRID_SPACING)))
+        } else if (move.action == 3) {
+            // build
+            this.unit_health.lineStyle(GRID_SIZE * 0.2, 0x00ff00, 0.5);
+            this.unit_health.moveTo(gx, gy);
+            this.unit_health.lineTo(gx + (move.dx * (GRID_SIZE + GRID_SPACING)), gy + (move.dy * (GRID_SIZE + GRID_SPACING)))
+        }
     }
 
     /**
@@ -706,4 +840,24 @@ document.getElementById('btn_set_round').onclick = function(){
 // add slider listener
 document.getElementById('input_set_speed').oninput = function() {
     veww.autoplay_delay = 1000 / parseInt(this.value);
+}
+
+document.getElementById('btn_switch_bc19_version').onclick = function(){
+    var version = document.getElementById('select_bc19_version').value;
+
+    // show loading
+    document.getElementById('btn_switch_text').classList.add('hidden');
+    document.getElementById('btn_switch_loading').classList.remove('hidden');
+
+    fetch('/set_version?' + version).then(function(res){
+        if (res.ok) {
+            console.log('switched versions!');
+            location.reload();
+        } else {
+            alert('Error switching versions');
+        }
+
+        document.getElementById('btn_switch_text').classList.remove('hidden');
+        document.getElementById('btn_switch_loading').classList.add('hidden');
+    });
 }

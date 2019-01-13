@@ -58,8 +58,27 @@
             <a href='/settings'>Configuration...</a>
 
             <hr/>
-            <h6>BC19 Version: <span id='bc19_version' class='dyn_val'>0.0.0</span></h6>
-            <h6 id='bc19_update_tips'>To update: <code>cd clairvoyance ; npm i bc19</code></h6>
+            <p>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">BC19 Version</span>
+                    </div>
+                    <select class="custom-select" id="select_bc19_version">
+                        
+                    </select>
+                    <div class="input-group-append">
+                        <button id='btn_switch_bc19_version' class="btn btn-primary" type="button">
+                            <div id='btn_switch_text'>Switch</div>
+                            <div id='btn_switch_loading' class='hidden'>
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Loading...
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </p>
+            <h6>Installed version: <span id='bc19_installed_version' class='dyn-val'>0.0.0</span></h6>
+            <h6>Newest version: <span id='bc19_newest_version' class='dyn-val'>0.0.0</span></h6>
             <hr/>
 
             <h3>Time Controls:</h3>
