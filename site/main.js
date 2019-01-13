@@ -592,8 +592,12 @@ class Veww {
         var robot_idx = 0;
         var i = 0;
         while (i < this.current_robin - 1) {
+            if (robot_idx == this.round_bots.length) {
+                return;
+            }
+
             // if the robot had a turn, count it
-            if (this.round_bots[i][2]) {
+            if (this.round_bots[robot_idx][2]) {
                 i++;
             }
             // otherwise skip it
