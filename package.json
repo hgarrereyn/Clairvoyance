@@ -8,9 +8,10 @@
   },
   "author": "hgarrereyn",
   "dependencies": {
-    "bc19": "^0.3.16",
+    "bc19": "^0.3.20",
     "browserify": "^16.2.3",
     "express": "^4.16.4",
+    "mersenne-twister": "^1.1.0",
     "npm": "^6.5.0",
     "npm-api": "^0.4.12",
     "socket.io": "^2.2.0",

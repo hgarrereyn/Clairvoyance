@@ -6,6 +6,8 @@ var Game = require('bc19/game')
 var SPECS = require('bc19/specs');
 var ActionRecord = require('bc19/action_record');
 
+var MersenneTwister = require('mersenne-twister');
+
 var UNIT_NAMES = [
     'Castle',
     'Church',
@@ -33,6 +35,42 @@ Sword by uzeir syarief from the Noun Project
 sniper by rizqa anindita from the Noun Project
 Tank by Sandhi Priyasmoro from the Noun Project
 */
+
+function patch() {
+    // allow us to access bound objects so we can copy the random state
+    var _bind = Function.prototype.apply.bind(Function.prototype.bind);
+    Object.defineProperty(Function.prototype, 'bind', {
+        value: function(obj) {
+            var boundFunction = _bind(this, arguments);
+            boundFunction.boundObject = obj;
+            return boundFunction;
+        }
+    });
+}
+patch();
+
+function deep_copy(game) {
+    // this step keeps a reference to the same mersenne-twister
+    var m = JSON.parse(JSON.stringify(game.random.boundObject));
+
+    var c = game.copy();
+
+    // check if this was before the MersenneTwister update:
+    if (game.random.boundObject.constructor.name != "MersenneTwister") {
+        return c;
+    }
+
+    var generator = new MersenneTwister();
+
+    var keys = Object.keys(m);
+    for (var i = 0; i < keys.length; ++i) {
+        generator[keys[i]] = m[keys[i]];
+    }
+
+    c.random = generator.random.bind(generator);
+
+    return c;
+}
 
 class Veww {
     process_replay(replay) {
@@ -77,7 +115,7 @@ class Veww {
 
         // checkpoints is of the type [(int) turn, (Game) checkpoint]
         // checkpoints[i] is the round i
-        this.checkpoints = [[0, this.game.copy()]];
+        this.checkpoints = [[0, this.game]];
 
         // check if we ran into that bug
         if (this.checkpoints[0][1].robots.length == 0) {
@@ -122,7 +160,7 @@ class Veww {
      */
     create_checkpoints() {
         // first round
-        var checkpoint = this.checkpoints[0][1].copy();
+        var checkpoint = deep_copy(this.checkpoints[0][1]);
         var robin = 0;
 
         this.robin_per_round = [0];
@@ -133,7 +171,7 @@ class Veww {
             checkpoint.enactTurn(diff);
 
             if (checkpoint.robin == 1) {
-                this.checkpoints.push([i+1, checkpoint.copy()]);
+                this.checkpoints.push([i+1, deep_copy(checkpoint)]);
 
                 // keep track of how many robots there were
                 this.robin_per_round.push(robin);
@@ -173,7 +211,7 @@ class Veww {
         round -= 1;
 
         // load the round
-        var checkpoint = this.checkpoints[round][1].copy();
+        var checkpoint = deep_copy(this.checkpoints[round][1]);
         var robin = 0;
 
         // track dead robots
