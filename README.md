@@ -32,12 +32,14 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 
 * Auto-reload
     * provide the path to a `replay.bc19` file and Clairvoyance will automatically reload it when it changes
+* load a replay from a url (thanks to ChiCubed)
 * Smooth controls
     * drag to move
     * scroll to zoom
 * Fine-grained time controls:
     * step forward or backwards by turn/round/robin
     * jump to a specific turn or round
+    * use sliders to control turn/round (thanks to ChiCubed)
     * click a button to auto-run the replay
         * with speed control (thanks to ChiCubed)
 * Tooltip information on gridpoint hover
@@ -50,6 +52,7 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * see the order that robots will run
 * Stats
     * view fuel and karbonite per team
+    * view the replay seed
 * Live-switch between versions of bc19 in the browser
     * scrim replays work!
 
