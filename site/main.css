@@ -109,6 +109,29 @@ input[type=range]::-ms-thumb {
     cursor: pointer;
 }
 
+input[type=range]:disabled::-moz-range-progress {
+    background: darkgrey;
+}
+
+input[type=range]:disabled::-ms-fill-lower {
+    background: darkgrey;
+}
+
+input[type=range]:disabled::-webkit-slider-thumb {
+    border-color: darkgrey;
+    cursor: default;
+}
+
+input[type=range]:disabled::-moz-range-thumb {
+    border-color: darkgrey;
+    cursor: default;
+}
+
+input[type=range]:disabled::-ms-thumb {
+    border-color: darkgrey;
+    cursor: default;
+}
+
 
 span.dyn_val {
     font-weight: bold;

@@ -136,6 +136,15 @@ class Veww {
         document.getElementById('game_max_rounds').innerText = this.num_rounds;
         document.getElementById('game_max_robins').innerText = this.robin_per_round[0];
 
+        var set_turn = document.getElementById('input_set_turn');
+        var set_round = document.getElementById('input_set_round');
+        var range_set_turn = document.getElementById('input_range_set_turn');
+        var range_set_round = document.getElementById('input_range_set_round');
+        set_turn.min = range_set_turn.min = 0;
+        set_turn.max = range_set_turn.max = this.max_turns;
+        set_turn.min = range_set_round.min = 0;
+        set_turn.max = range_set_round.max = this.num_rounds;
+
         console.log(this.game);
 
         // viewer state
@@ -282,15 +291,6 @@ class Veww {
         }
     }
 
-    next_turn_norender() {
-        // cancel autoplay if we reach the end
-        if (this.current_turn >= this.max_turns && this.is_playing) {
-            this.stop_autoplay();
-        } else {
-            this.jump_to_turn(this.current_turn + 1);
-        }
-    }
-
     next_turn() {
         // cancel autoplay if we reach the end
         if (this.current_turn >= this.max_turns && this.is_playing) {
@@ -324,11 +324,9 @@ class Veww {
             return;
         }
 
-        while (curr_time > this.last_turn_time + this.autoplay_delay) {
-            this.last_turn_time += this.autoplay_delay;
-            this.next_turn_norender();
-        }
-
+        var num_turns_elapsed = Math.ceil((curr_time - this.last_turn_time) / this.autoplay_delay);
+        this.last_turn_time += num_turns_elapsed * this.autoplay_delay;
+        this.jump_to_turn(Math.min(this.current_turn + num_turns_elapsed, this.max_turns));
         this.render();
 
         if (this.current_turn < this.max_turns) {
@@ -349,6 +347,10 @@ class Veww {
         document.getElementById('btn_prev_round').classList.add('disabled')
         document.getElementById('btn_next_robin').classList.add('disabled')
         document.getElementById('btn_prev_robin').classList.add('disabled')
+
+        // disable slider inputs
+        document.getElementById('input_range_set_turn').disabled = true
+        document.getElementById('input_range_set_round').disabled = true
 
         // configure start/stop
         document.getElementById('btn_start_autoplay').classList.add('disabled')
@@ -373,6 +375,10 @@ class Veww {
         document.getElementById('btn_prev_round').classList.remove('disabled')
         document.getElementById('btn_next_robin').classList.remove('disabled')
         document.getElementById('btn_prev_robin').classList.remove('disabled')
+
+        // enable slider inputs
+        document.getElementById('input_range_set_turn').disabled = false
+        document.getElementById('input_range_set_round').disabled = false
 
         // configure start/stop
         document.getElementById('btn_start_autoplay').classList.remove('disabled')
@@ -675,6 +681,9 @@ class Veww {
         document.getElementById('game_curr_robin').innerText = this.current_robin;
         document.getElementById('game_max_robins').innerText = this.robin_per_round[this.current_round];
 
+        document.getElementById('input_range_set_turn').value = this.current_turn;
+        document.getElementById('input_range_set_round').value = this.current_round;
+
         document.getElementById('game_red_fuel').innerText = this.current_game.fuel[0];
         document.getElementById('game_blue_fuel').innerText = this.current_game.fuel[1];
         document.getElementById('game_red_karbonite').innerText = this.current_game.karbonite[0];
@@ -819,7 +828,7 @@ load_replay();
 var socket = io();
 socket.on('file_update', load_replay);
 
-// add click listeners
+// add click / slider / radio listeners
 document.getElementById('btn_next_turn').onclick = function(){
     if (!veww.is_playing) veww.next_turn();
 }
@@ -859,12 +868,38 @@ document.getElementById('btn_jump_start').onclick = function(){
     }
 }
 
+document.getElementById('input_set_speed').oninput = function() {
+    veww.autoplay_delay = Math.pow(1000 / parseInt(this.value), 4.32817);
+}
+
+Array.from(document.getElementById('radio_select_input_type').children).forEach(function(elem) {
+    elem.children[0].onchange = function() {
+        if (this.value == 'number') {
+            document.getElementById('input_range_set_turn').parentElement.classList.add('hidden');
+            document.getElementById('input_range_set_round').parentElement.classList.add('hidden');
+            document.getElementById('input_set_turn').parentElement.classList.remove('hidden');
+            document.getElementById('input_set_round').parentElement.classList.remove('hidden');
+        } else if (this.value == 'range') {
+            document.getElementById('input_set_turn').parentElement.classList.add('hidden');
+            document.getElementById('input_set_round').parentElement.classList.add('hidden');
+            document.getElementById('input_range_set_turn').parentElement.classList.remove('hidden');
+            document.getElementById('input_range_set_round').parentElement.classList.remove('hidden');
+        }
+    }
+});
+
 document.getElementById('btn_set_turn').onclick = function(){
     if (!veww.is_playing) {
         var turn = parseInt(document.getElementById('input_set_turn').value);
         veww.jump_to_turn(turn);
         veww.render();
     }
+}
+
+document.getElementById('input_range_set_turn').oninput = function() {
+    var turn = parseInt(this.value);
+    veww.jump_to_turn(turn);
+    veww.render();
 }
 
 document.getElementById('btn_set_round').onclick = function(){
@@ -875,9 +910,10 @@ document.getElementById('btn_set_round').onclick = function(){
     }
 }
 
-// add slider listener
-document.getElementById('input_set_speed').oninput = function() {
-    veww.autoplay_delay = 1000 / parseInt(this.value);
+document.getElementById('input_range_set_round').oninput = function() {
+    var round = parseInt(this.value);
+    veww.jump_to_round_robin(round, 1);
+    veww.render();
 }
 
 document.getElementById('btn_switch_bc19_version').onclick = function(){

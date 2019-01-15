@@ -16,3 +16,18 @@ document.getElementById('btn_watch_replay').onclick = function() {
         }
     });
 }
+
+document.getElementById('btn_load_replay_url').onclick = function() {
+    var url = document.getElementById('input_replay_file_url').value;
+    var encoded = btoa(url);
+
+    fetch('/set_replay_url?' + encoded).then(function(res){
+        if (res.ok) {
+            console.log('good');
+            window.location.href = '/';
+        } else {
+            console.log(res.status);
+            alert('Bad URL');
+        }
+    });
+}
