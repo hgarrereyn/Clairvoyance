@@ -106,7 +106,7 @@ class Veww {
         this.seed = 0;
         for (let i = 0; i<4; i++) this.seed += (this.replay[i+2] << (24-8*i));
 
-        console.log('seed: ' + this.seed);
+        document.getElementById('replay_seed').innerText = this.seed;
 
         this.game = new Game(this.seed, 0, 0, false, false);
 
@@ -818,6 +818,14 @@ function load_replay() {
         } else {
             console.log('no replay file');
             window.location.href = '/settings';
+        }
+    });
+
+    fetch('/replay_path').then(function(resp) {
+        if (resp.ok) {
+            resp.text().then(function(resp) {
+                document.getElementById('replay_path').innerText = resp;
+            });
         }
     });
 }

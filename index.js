@@ -83,6 +83,16 @@ app.get('/replay', function(req, res) {
     }
 });
 
+app.get('/replay_path', function(req, res) {
+    if (used_path == 'file') {
+        res.send(file_path);
+    } else if (used_path == 'url') {
+        res.send(url_path);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
 app.get('/set_replay', function(req, res) {
     var fpath = (new Buffer(req.url.split('?')[1], 'base64')).toString('binary');
 
