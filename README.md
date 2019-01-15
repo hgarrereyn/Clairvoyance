@@ -56,6 +56,11 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 * Live-switch between versions of bc19 in the browser
     * scrim replays work!
 
+# Version History
+
+## 1.0.0 (1/14/19)
+* thought it might be a good idea to track versions
+
 # Ideas? Problems?
 
 Do you have ideas for features? Did you find bugs? Please submit an issue or even better, make a pull request!
