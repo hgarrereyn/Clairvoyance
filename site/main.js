@@ -514,12 +514,12 @@ class Veww {
         var y = this.hover_coordinate[1];
 
         //begin Ryan Sharafuddin contributions
-        var redVisionColor = 0xFA7575;
-        var blueVisionColor = 0x115CFC;
-        var redAttackColor = 0x800303;
-        var blueAttackColor = 0x0014A7;
-        var hoverX = x;
-        var hoverY = y;
+        let redVisionColor = 0xFA7575;
+        let blueVisionColor = 0x115CFC;
+        let redAttackColor = 0x800303;
+        let blueAttackColor = 0x0014A7;
+        let hoverX = x;
+        let hoverY = y;
         let found = false
         for (var i = 0; i < this.round_bots.length; ++i) {
           var robot = this.round_bots[i][0];
@@ -529,21 +529,21 @@ class Veww {
             break;
           }
         }
-        var vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+        let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
         console.log("Vision radius of robot is: " + vision);
         for(let gridX = 0; gridX < this.size; gridX++) {
           for(let gridY = 0; gridY < this.size; gridY++) {
             let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2
             if( found && (radius <= vision) && this.current_game.map[gridY][gridX]) {
-              var visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
+              let visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
               this.graphics.beginFill(visionColor);
               let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
               if(attack && (radius <= vision) && (attack[0] <= radius) && (radius <= attack[1])) {
-                var attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
+                let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
                 this.graphics.beginFill(attackColor);
               }
-              var gx = gridX * (GRID_SIZE + GRID_SPACING);
-              var gy = gridY * (GRID_SIZE + GRID_SPACING);
+              let gx = gridX * (GRID_SIZE + GRID_SPACING);
+              let gy = gridY * (GRID_SIZE + GRID_SPACING);
               this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
               this.graphics.endFill();
             }
