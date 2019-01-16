@@ -530,7 +530,7 @@ class Veww {
         let redAttackColor = 0xd60000; //0xd60000  0xf49f9f 0x710000
         let blueAttackColor = 0x0014da; // 0x0014A7 0x4971ff
         let redMoveColor = 0x550000;
-        let blueMoveColor = 0x000852; 0x001aaa 0x0014da
+        let blueMoveColor = 0x000852; // 0x001aaa 0x0014da
         let hoverX = x; // 0x000852 0x0014da  0x7686FD
         let hoverY = y;
         let found = false
