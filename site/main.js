@@ -466,6 +466,27 @@ class Veww {
         }.bind(this));
     }
 
+    fillSquare(x, y) {
+      //fills square with default color fills
+      // determine tile color
+      if (this.current_game.karbonite_map[y][x]) {
+          this.graphics.beginFill(0x00ff00);
+      } else if (this.current_game.fuel_map[y][x]) {
+          this.graphics.beginFill(0xffff00);
+      } else if (this.current_game.map[y][x]) {
+          this.graphics.beginFill(0xcccccc);
+      } else {
+          this.graphics.beginFill(0x111111);
+      }
+
+      // calculate grid position
+      var gx = x * (GRID_SIZE + GRID_SPACING);
+      var gy = y * (GRID_SIZE + GRID_SPACING);
+
+      // draw it
+      this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+      this.graphics.endFill();
+    }
     // we can do this just once per game
     draw_grid() {
         this.graphics.clear();
@@ -473,25 +494,7 @@ class Veww {
         // render tiles
         for (var y = 0; y < this.size; ++y) {
             for (var x = 0; x < this.size; ++x) {
-
-                // determine tile color
-                if (this.current_game.karbonite_map[y][x]) {
-                    this.graphics.beginFill(0x00ff00);
-                } else if (this.current_game.fuel_map[y][x]) {
-                    this.graphics.beginFill(0xffff00);
-                } else if (this.current_game.map[y][x]) {
-                    this.graphics.beginFill(0xcccccc);
-                } else {
-                    this.graphics.beginFill(0x111111);
-                }
-
-                // calculate grid position
-                var gx = x * (GRID_SIZE + GRID_SPACING);
-                var gy = y * (GRID_SIZE + GRID_SPACING);
-
-                // draw it
-                this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-                this.graphics.endFill();
+              this.fillSquare(x,y);
             }
         }
     }
@@ -510,7 +513,11 @@ class Veww {
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
 
-        //search for a robot here
+        //begin Ryan Sharafuddin contributions
+        var redVisionColor = 0xFA7575;
+        var blueVisionColor = 0x115CFC;
+        var redAttackColor = 0x800303;
+        var blueAttackColor = 0x0014A7;
         var hoverX = x;
         var hoverY = y;
         let found = false
@@ -526,37 +533,27 @@ class Veww {
         console.log("Vision radius of robot is: " + vision);
         for(let gridX = 0; gridX < this.size; gridX++) {
           for(let gridY = 0; gridY < this.size; gridY++) {
-            if( found && ((gridX - robot.x)**2 + (gridY - robot.y)**2 <= vision) && this.current_game.map[gridY][gridX]) {
-              this.graphics.beginFill(0xFA7575); //0xff20f
+            let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2
+            if( found && (radius <= vision) && this.current_game.map[gridY][gridX]) {
+              var visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
+              this.graphics.beginFill(visionColor);
+              let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
+              if(attack && (radius <= vision) && (attack[0] <= radius) && (radius <= attack[1])) {
+                var attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
+                this.graphics.beginFill(attackColor);
+              }
               var gx = gridX * (GRID_SIZE + GRID_SPACING);
               var gy = gridY * (GRID_SIZE + GRID_SPACING);
               this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
               this.graphics.endFill();
             }
             else {
-              //return everything else to original fill
-              // determine tile color
-              if (this.current_game.karbonite_map[gridY][gridX]) {
-                  this.graphics.beginFill(0x00ff00);
-              } else if (this.current_game.fuel_map[gridY][gridX]) {
-                  this.graphics.beginFill(0xffff00);
-              } else if (this.current_game.map[gridY][gridX]) {
-                  this.graphics.beginFill(0xcccccc);
-              } else {
-                  this.graphics.beginFill(0x111111);
-              }
-
-              // calculate grid position
-              var gx = gridX * (GRID_SIZE + GRID_SPACING);
-              var gy = gridY * (GRID_SIZE + GRID_SPACING);
-
-              // draw it
-              this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-              this.graphics.endFill();
+              this.fillSquare(gridX, gridY);
             }
           }
         }
         //end Ryan Sharafuddin additions
+
         this.dyn_graphics.beginFill(0x9e42f4);
         var gx = x * (GRID_SIZE + GRID_SPACING);
         var gy = y * (GRID_SIZE + GRID_SPACING);
