@@ -62,7 +62,7 @@ class Veww {
                 document.getElementById('bc19_newest_version').innerText = versions['newest'];
             })
         });
-        
+
         this.replay = new Uint8Array(replay);
 
         this.seed = 0;
@@ -115,7 +115,7 @@ class Veww {
 
     /**
      * Checkpoint the start of each round to make it easier to jump to certain positions.
-     * 
+     *
      * Creates the following lookup variables:
      * - this.num_rounds := number of rounds in the game
      * - this.robin_per_round := robin count per round
@@ -158,7 +158,7 @@ class Veww {
             this.current_turn = 0;
             this.current_round = 0;
             this.current_robin = 0;
-            
+
             this.round_bots = []
             for (var i = 0; i < this.current_game.robots.length; ++i) {
                 this.round_bots.push([this.current_game.robots[i], false, true]);
@@ -386,7 +386,7 @@ class Veww {
         this.spritepool = Array(6);
         for (var i = 0; i < 6; ++i) {
             this.spritepool[i] = [];
-            
+
             for (var j = 0; j < MAX_SPRITES_PER_TYPE; ++j) {
                 var sprite = new PIXI.Sprite(this.textures[i]);
                 sprite.anchor = new PIXI.Point(0, 0);
@@ -395,7 +395,7 @@ class Veww {
                 this.spritepool[i].push(sprite);
             }
         }
-        
+
         // interactive graphic components
         this.hover_coordinate = [-1,-1];
         this.selected_unit = -1; //index
@@ -451,7 +451,7 @@ class Veww {
 
         // scroll to zoom
         document.getElementById('game').addEventListener('wheel', function(event) {
-            
+
             // calculate target position in the grid's coordinate frame
             var px = event.x - this.grid.position.x;
             var py = event.y - this.grid.position.y;
@@ -464,6 +464,10 @@ class Veww {
             this.grid.position.x -= (px * (zoom_amount - 1));
             this.grid.position.y -= (py * (zoom_amount - 1));
         }.bind(this));
+    }
+
+    determine_tile_color() {
+      
     }
 
     // we can do this just once per game
@@ -510,6 +514,33 @@ class Veww {
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
 
+        //search for a robot here
+        var hoverX = x;
+        var hoverY = y;
+        for (var i = 0; i < this.round_bots.length; ++i) {
+          var robot = this.round_bots[i][0];
+          var is_dead = this.round_bots[i][1];
+          if(!is_dead && robot.x == hoverX && robot.y == hoverY) {
+            console.log("There is robot here; now get its vision and attack radius");
+            var vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+            console.log("Vision radius of robot is: " + vision);
+            for(let gridX = 0; gridX < this.size; gridX++) {
+              for(let gridY = 0; gridY < this.size; gridY++) {
+                if( ((gridX - robot.x)**2 + (gridY - robot.y)**2 <= vision) && this.current_game.map[gridY][gridX]) {
+                  this.graphics.beginFill(0xFA7575); //0xff20f
+                  var gx = gridX * (GRID_SIZE + GRID_SPACING);
+                  var gy = gridY * (GRID_SIZE + GRID_SPACING);
+                  this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+                  this.graphics.endFill();
+                }
+                else {
+                  //return everything else to original fill
+                }
+              }
+            }
+          }
+        }
+        //end Ryan Sharafuddin additions
         this.dyn_graphics.beginFill(0x9e42f4);
         var gx = x * (GRID_SIZE + GRID_SPACING);
         var gy = y * (GRID_SIZE + GRID_SPACING);
@@ -585,9 +616,9 @@ class Veww {
 
         var i = this.current_turn - 1;
         var diff = this.replay.slice(6 + 8 * i, 6 + 8 * (i + 1));
-        
+
         var move = ActionRecord.FromBytes(diff);
-        
+
         // find the robot for turn (robin-1)
         var robot_idx = 0;
         var i = 0;
@@ -641,7 +672,7 @@ class Veww {
         document.getElementById('game_blue_fuel').innerText = this.current_game.fuel[1];
         document.getElementById('game_red_karbonite').innerText = this.current_game.karbonite[0];
         document.getElementById('game_blue_karbonite').innerText = this.current_game.karbonite[1];
-    
+
         // turn queue
         var html = '';
 
@@ -686,7 +717,7 @@ class Veww {
 
                     document.getElementById('unit_signal').innerText = robot.signal;
                     document.getElementById('unit_castle_talk').innerText = robot.castle_talk;
-                    
+
                     document.getElementById('unit_img').src = '/img/' + UNIT_NAMES[robot.unit].toLowerCase() + '.png';
 
                     if (robot.team == 0) {
