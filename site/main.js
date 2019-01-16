@@ -487,6 +487,14 @@ class Veww {
       this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
       this.graphics.endFill();
     }
+
+    outlineSquare(color, x, y) {
+      this.dyn_graphics.beginFill(color);
+      var gx = x * (GRID_SIZE + GRID_SPACING);
+      var gy = y * (GRID_SIZE + GRID_SPACING);
+      this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
+      this.dyn_graphics.endFill();
+    }
     // we can do this just once per game
     draw_grid() {
         this.graphics.clear();
@@ -513,12 +521,15 @@ class Veww {
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
 
-        //begin Ryan Sharafuddin contributions
+      //redVision 0xFA7575 redAttack 0x800303
+      //blue vision 0x7686FD blue attack 0x0014A7 with outlines
+      // 0x000852 0x0014da 0x7686FD  move attack vision
+      // 0x550000  0xd60000  0xf49f9f move attack vision  with all 3 shading
         let redVisionColor = 0xFA7575;
         let blueVisionColor = 0x7686FD;// 0x115CFC 0x4D62FE 0x7686FD
-        let redAttackColor = 0x800303;
+        let redAttackColor = 0x800303; //0xd60000  //0xf49f9f //0x710000
         let blueAttackColor = 0x0014A7; // 0x0014A7 0x4971ff
-        let hoverX = x;
+        let hoverX = x; // 0x000852 0x0014da  0x7686FD
         let hoverY = y;
         let found = false
         for (var i = 0; i < this.round_bots.length; ++i) {
@@ -530,17 +541,28 @@ class Veww {
           }
         }
         let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+        let wantsVisible = document.getElementById("shadeVisible").checked;
+        let wantsAttackable = document.getElementById("shadeAttackable").checked;
+        let wantsMovable = document.getElementById("shadeMovable").checked;
         console.log("Vision radius of robot is: " + vision);
         for(let gridX = 0; gridX < this.size; gridX++) {
           for(let gridY = 0; gridY < this.size; gridY++) {
             let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2
             if( found && (radius <= vision) && this.current_game.map[gridY][gridX]) {
+              //since vision radius is >= than attack or move radius for all units, this is okay
               let visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
-              this.graphics.beginFill(visionColor);
+              if(wantsVisible) {
+                this.graphics.beginFill(visionColor);
+              }
               let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
-              if(attack && (radius <= vision) && (attack[0] <= radius) && (radius <= attack[1])) {
+              if(attack && (radius <= vision) && (attack[0] <= radius) && (radius <= attack[1]) && wantsAttackable) {
                 let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
                 this.graphics.beginFill(attackColor);
+              }
+              let move = SPECS.UNITS[robot.unit].SPEED;
+              if(move > 0 && wantsMovable && radius < move) {
+                let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
+                this.graphics.beginFill(moveColor);
               }
               let gx = gridX * (GRID_SIZE + GRID_SPACING);
               let gy = gridY * (GRID_SIZE + GRID_SPACING);
@@ -552,13 +574,8 @@ class Veww {
             }
           }
         }
-        //end Ryan Sharafuddin additions
 
-        this.dyn_graphics.beginFill(0x9e42f4);
-        var gx = x * (GRID_SIZE + GRID_SPACING);
-        var gy = y * (GRID_SIZE + GRID_SPACING);
-        this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
-        this.dyn_graphics.endFill();
+        this.outlineSquare(0x9e42f4, x, y);
 
         // hide all units
         for (var i = 0; i < 6; ++i) {
