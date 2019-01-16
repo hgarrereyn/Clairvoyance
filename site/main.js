@@ -515,9 +515,9 @@ class Veww {
 
         //begin Ryan Sharafuddin contributions
         let redVisionColor = 0xFA7575;
-        let blueVisionColor = 0x115CFC;
+        let blueVisionColor = 0x7686FD;// 0x115CFC 0x4D62FE 0x7686FD
         let redAttackColor = 0x800303;
-        let blueAttackColor = 0x0014A7;
+        let blueAttackColor = 0x0014A7; // 0x0014A7 0x4971ff
         let hoverX = x;
         let hoverY = y;
         let found = false
