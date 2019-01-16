@@ -33,6 +33,7 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 * Auto-reload
     * provide the path to a `replay.bc19` file and Clairvoyance will automatically reload it when it changes
 * load a replay from a url (thanks to ChiCubed)
+* upload a replay to view
 * Smooth controls
     * drag to move
     * scroll to zoom
@@ -57,6 +58,9 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * scrim replays work!
 
 # Version History
+
+## 1.0.1 (1/15/19)
+* added option to upload replay files to view
 
 ## 1.0.0 (1/14/19)
 * thought it might be a good idea to track versions

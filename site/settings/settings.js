@@ -31,3 +31,8 @@ document.getElementById('btn_load_replay_url').onclick = function() {
         }
     });
 }
+
+document.getElementById('input_replay_file_upload').onchange = function(e) {
+    var fname = document.getElementById('input_replay_file_upload').files[0].name;
+    document.getElementById('label_replay_upload').innerText = fname;
+}

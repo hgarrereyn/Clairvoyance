@@ -10,6 +10,10 @@ const port = 8123;
 const npm = require('npm');
 const browserify = require('browserify');
 
+var path = require('path');
+var busboy = require("connect-busboy");
+app.use(busboy());
+
 var pkg = require('bc19/package');
 
 var versions = {
@@ -78,6 +82,8 @@ app.get('/replay', function(req, res) {
                 resp.pipe(res);
             });
         }
+    } else if (used_path == 'upload') {
+        res.sendFile(path.join(__dirname, '.tmp_replay'), {dotfiles: 'allow'});
     } else {
         res.sendStatus(404);
     }
@@ -88,6 +94,8 @@ app.get('/replay_path', function(req, res) {
         res.send(file_path);
     } else if (used_path == 'url') {
         res.send(url_path);
+    } else if (used_path == 'upload') {
+        res.send(file_path);
     } else {
         res.sendStatus(404);
     }
@@ -126,6 +134,25 @@ app.get('/set_replay_url', function(req, res) {
         res.sendStatus(404);
     }
 })
+
+app.post('/upload_replay', function(req, res) {
+    if(req.busboy) {
+        req.pipe(req.busboy);
+
+        req.busboy.on("file", function(fieldName, fileStream, fileName, encoding, mimeType) {
+            file_path = fileName;
+            used_path = 'upload';
+
+            // save to disk at: .tmp_replay
+            var fstr = fs.createWriteStream(path.join(__dirname, '.tmp_replay'));
+            fileStream.pipe(fstr);
+
+            res.redirect('/')
+        });
+    } else {
+        res.redirect('/settings');
+    }
+});
 
 app.get('/version', function(req, res) {
     res.send(JSON.stringify(versions));
