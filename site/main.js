@@ -466,10 +466,6 @@ class Veww {
         }.bind(this));
     }
 
-    determine_tile_color() {
-      
-    }
-
     // we can do this just once per game
     draw_grid() {
         this.graphics.clear();
@@ -517,26 +513,46 @@ class Veww {
         //search for a robot here
         var hoverX = x;
         var hoverY = y;
+        let found = false
         for (var i = 0; i < this.round_bots.length; ++i) {
           var robot = this.round_bots[i][0];
           var is_dead = this.round_bots[i][1];
           if(!is_dead && robot.x == hoverX && robot.y == hoverY) {
-            console.log("There is robot here; now get its vision and attack radius");
-            var vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
-            console.log("Vision radius of robot is: " + vision);
-            for(let gridX = 0; gridX < this.size; gridX++) {
-              for(let gridY = 0; gridY < this.size; gridY++) {
-                if( ((gridX - robot.x)**2 + (gridY - robot.y)**2 <= vision) && this.current_game.map[gridY][gridX]) {
-                  this.graphics.beginFill(0xFA7575); //0xff20f
-                  var gx = gridX * (GRID_SIZE + GRID_SPACING);
-                  var gy = gridY * (GRID_SIZE + GRID_SPACING);
-                  this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-                  this.graphics.endFill();
-                }
-                else {
-                  //return everything else to original fill
-                }
+            found = true;
+            break;
+          }
+        }
+        var vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+        console.log("Vision radius of robot is: " + vision);
+        for(let gridX = 0; gridX < this.size; gridX++) {
+          for(let gridY = 0; gridY < this.size; gridY++) {
+            if( found && ((gridX - robot.x)**2 + (gridY - robot.y)**2 <= vision) && this.current_game.map[gridY][gridX]) {
+              this.graphics.beginFill(0xFA7575); //0xff20f
+              var gx = gridX * (GRID_SIZE + GRID_SPACING);
+              var gy = gridY * (GRID_SIZE + GRID_SPACING);
+              this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+              this.graphics.endFill();
+            }
+            else {
+              //return everything else to original fill
+              // determine tile color
+              if (this.current_game.karbonite_map[gridY][gridX]) {
+                  this.graphics.beginFill(0x00ff00);
+              } else if (this.current_game.fuel_map[gridY][gridX]) {
+                  this.graphics.beginFill(0xffff00);
+              } else if (this.current_game.map[gridY][gridX]) {
+                  this.graphics.beginFill(0xcccccc);
+              } else {
+                  this.graphics.beginFill(0x111111);
               }
+
+              // calculate grid position
+              var gx = gridX * (GRID_SIZE + GRID_SPACING);
+              var gy = gridY * (GRID_SIZE + GRID_SPACING);
+
+              // draw it
+              this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+              this.graphics.endFill();
             }
           }
         }
