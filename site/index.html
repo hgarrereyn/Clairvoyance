@@ -6,7 +6,7 @@
         <link rel='stylesheet' href='/main.css'>
     </head>
     <body>
-        
+
         <div id='game'></div>
 
         <div id='tooltip'>
@@ -64,7 +64,7 @@
                         <span class="input-group-text">BC19 Version</span>
                     </div>
                     <select class="custom-select" id="select_bc19_version">
-                        
+
                     </select>
                     <div class="input-group-append">
                         <button id='btn_switch_bc19_version' class="btn btn-primary" type="button">
@@ -82,7 +82,7 @@
             <hr/>
 
             <h3>Time Controls:</h3>
-            
+
             <div class='row pad-row'>
                 <div class='col-2 align-self-center'>
                     <p class='no-margin'>Turn:</p>
@@ -181,7 +181,73 @@
             </div>
 
             <hr/>
+            <div>
+              <h3>Display Options</h3>
+              <div id="allSliders">
+                <div class="sliderLabelContainer">
+                  <p class="sliderLabel">Shade movable:</p>
+                </div>
+                <div class="container">
+                  <label class="switch" for="shadeMovable">
+                    <input type="checkbox" id="shadeMovable" />
+                    <div class="slider round"></div>
+                  </label>
+                </div>
 
+                <div class="sliderLabelContainer">
+                  <p class="sliderLabel">Shade attackable:</p>
+                </div>
+                <div class="container">
+                  <label class="switch" for="shadeAttackable">
+                    <input type="checkbox" id="shadeAttackable" />
+                    <div class="slider round"></div>
+                  </label>
+                </div>
+
+                <div class="sliderLabelContainer">
+                  <p class="sliderLabel">Shade visible:</p>
+                </div>
+                <div class="container">
+                  <label class="switch" for="shadeVisible">
+                    <input type="checkbox" id="shadeVisible" />
+                    <div class="slider round"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div id="allSliders">
+              <div class="sliderLabelContainer">
+                <p class="sliderLabel">Shade movable:</p>
+              </div>
+              <div class="container">
+                <label class="switch" for="shadeMovable">
+                  <input type="checkbox" id="shadeMovable" />
+                  <div class="slider round"></div>
+                </label>
+              </div>
+
+              <div class="sliderLabelContainer">
+                <p class="sliderLabel">Shade attackable:</p>
+              </div>
+              <div class="container">
+                <label class="switch" for="shadeAttackable">
+                  <input type="checkbox" id="shadeAttackable" />
+                  <div class="slider round"></div>
+                </label>
+              </div>
+
+              <div class="sliderLabelContainer">
+                <p class="sliderLabel">Shade visible:</p>
+              </div>
+              <div class="container">
+                <label class="switch" for="shadeVisible">
+                  <input type="checkbox" id="shadeVisible" />
+                  <div class="slider round"></div>
+                </label>
+              </div>
+            </div> -->
+            <hr/>
             <h3>Resources:</h3>
 
             <div class='row display-panel'>
