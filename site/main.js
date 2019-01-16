@@ -527,11 +527,11 @@ class Veww {
         // 0x550000  0xd60000  0xf49f9f move attack vision  with all 3 shading
         let redVisionColor = 0xf49f9f;
         let blueVisionColor = 0x7686FD;// 0x115CFC 0x4D62FE 0x7686FD
-        let redAttackColor = 0xd60000; //0xd60000  0xf49f9f 0x710000
-        let blueAttackColor = 0x0014da; // 0x0014A7 0x4971ff
+        let redAttackColor = 0x710000; //0xd60000  0xf49f9f 0x710000
+        let blueAttackColor = 0x001087; // 0x0014A7 0x4971ff 0x001087 0x000e79 0x001296
         let redMoveColor = 0x550000;
-        let blueMoveColor = 0x000852; // 0x001aaa 0x0014da
-        let hoverX = x; // 0x000852 0x0014da  0x7686FD
+        let blueMoveColor = 0x000852; // 0x001aaa 0x0014da 0x001296
+        let hoverX = x; // 0x000000 0x0014da  0x7686FD
         let hoverY = y;
         let found = false
         for (var i = 0; i < this.round_bots.length; ++i) {
@@ -564,7 +564,8 @@ class Veww {
               let move = SPECS.UNITS[robot.unit].SPEED;
               if(move > 0 && wantsMovable && radius <= move) {
                 let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
-                this.graphics.beginFill(moveColor);
+                //this.graphics.beginFill(moveColor);
+                this.outlineSquare(moveColor, gridX, gridY);
               }
               let gx = gridX * (GRID_SIZE + GRID_SPACING);
               let gy = gridY * (GRID_SIZE + GRID_SPACING);
