@@ -521,14 +521,16 @@ class Veww {
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
 
-      //redVision 0xFA7575 redAttack 0x800303
-      //blue vision 0x7686FD blue attack 0x0014A7 with outlines
-      // 0x000852 0x0014da 0x7686FD  move attack vision
-      // 0x550000  0xd60000  0xf49f9f move attack vision  with all 3 shading
-        let redVisionColor = 0xFA7575;
+        //redVision 0xFA7575 redAttack 0x800303
+        //blue vision 0x7686FD blue attack 0x0014A7 with outlines
+        // 0x000852 0x0014da 0x7686FD  move attack vision
+        // 0x550000  0xd60000  0xf49f9f move attack vision  with all 3 shading
+        let redVisionColor = 0xf49f9f;
         let blueVisionColor = 0x7686FD;// 0x115CFC 0x4D62FE 0x7686FD
-        let redAttackColor = 0x800303; //0xd60000  //0xf49f9f //0x710000
-        let blueAttackColor = 0x0014A7; // 0x0014A7 0x4971ff
+        let redAttackColor = 0xd60000; //0xd60000  0xf49f9f 0x710000
+        let blueAttackColor = 0x0014da; // 0x0014A7 0x4971ff
+        let redMoveColor = 0x550000;
+        let blueMoveColor = 0x000852; 0x001aaa 0x0014da
         let hoverX = x; // 0x000852 0x0014da  0x7686FD
         let hoverY = y;
         let found = false
@@ -560,7 +562,7 @@ class Veww {
                 this.graphics.beginFill(attackColor);
               }
               let move = SPECS.UNITS[robot.unit].SPEED;
-              if(move > 0 && wantsMovable && radius < move) {
+              if(move > 0 && wantsMovable && radius <= move) {
                 let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
                 this.graphics.beginFill(moveColor);
               }
