@@ -732,6 +732,7 @@ class Veww {
                     document.getElementById('unit_id').innerText = robot.id;
 
                     document.getElementById('unit_signal').innerText = robot.signal;
+                    document.getElementById('unit_signal_radius').innerText = robot.signal_radius;
                     document.getElementById('unit_castle_talk').innerText = robot.castle_talk;
                     
                     document.getElementById('unit_img').src = '/img/' + UNIT_NAMES[robot.unit].toLowerCase() + '.png';
