@@ -52,6 +52,8 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * view fuel and karbonite per team
 * Live-switch between versions of bc19 in the browser
     * scrim replays work!
+* Display options
+    * Can show a robot's movable, attackable, or visible squares on hover
 
 # Ideas? Problems?
 
