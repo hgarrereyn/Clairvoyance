@@ -81,6 +81,15 @@
             <h6>Newest version: <span id='bc19_newest_version' class='dyn-val'>0.0.0</span></h6>
             <hr/>
 
+            <h3>Replay Info:</h3>
+
+            <div class='display-panel'>
+                <p>Path: <span id='replay_path' class='dyn_val'>/my/replay/path/replay.bc19</span></p>
+                <p>Seed: <span id='replay_seed' class='dyn_val'>1337</span></p>
+            </div>
+
+            <hr/>
+
             <h3>Time Controls:</h3>
 
             <div class='row pad-row'>
@@ -146,9 +155,30 @@
                     <p class='no-margin'>Speed:</p>
                 </div>
                 <div class='col-7'>
-                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
-                        <input id='input_set_speed' type="range" min="1" max="100" value="50" class="form-control-range">
+                    <div class="input-group input-group-sm mb-0">
+                        <input id='input_set_speed' type="range" min="200" max="1000" value="500" class="form-control-range">
                     </div>
+                </div>
+            </div>
+
+            <div class='row pad-row'>
+                <div class='col-auto pr-2 align-self-center'>
+                    <p class='no-margin'>Use</p>
+                </div>
+                <div class='col-auto px-0'>
+                    <div class="btn-group btn-group-toggle btn-group-sm mb-0" id="radio_select_input_type" data-toggle="buttons">
+                        <label class="btn btn-primary active">
+                            <input type="radio" name="radio_select_input_type" value="number" autocomplete="off" checked>
+                            Numbers
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" name="radio_select_input_type" value="range" autocomplete="off">
+                            Sliders
+                        </label>
+                    </div>
+                </div>
+                <div class='col-auto pl-2 align-self-center'>
+                    <p class='no-margin'>for turn/round inputs</p>
                 </div>
             </div>
 
@@ -157,11 +187,14 @@
                     <p class='no-margin'>Set Turn:</p>
                 </div>
                 <div class='col-7'>
-                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
+                    <div class="input-group input-group-sm mb-0">
                         <input id='input_set_turn' type="number" class="form-control" placeholder="Turn">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button" id="btn_set_turn">Go</button>
                         </div>
+                    </div>
+                    <div class="input-group input-group-sm mb-0 hidden">
+                        <input id='input_range_set_turn' type="range" class="form-control-range">
                     </div>
                 </div>
             </div>
@@ -171,11 +204,14 @@
                     <p class='no-margin'>Set Round:</p>
                 </div>
                 <div class='col-7'>
-                    <div class="input-group input-group-sm mb-3" style='margin-bottom:0px !important;'>
+                    <div class="input-group input-group-sm mb-0">
                         <input id='input_set_round' type="number" class="form-control" placeholder="Round">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button" id="btn_set_round">Go</button>
                         </div>
+                    </div>
+                    <div class="input-group input-group-sm mb-0 hidden">
+                        <input id='input_range_set_round' type="range" class="form-control-range">
                     </div>
                 </div>
             </div>
@@ -241,6 +277,11 @@
             </div>
 
         </div>
+
+        <!-- Bootstrap -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
         <!-- Canvas drawing library -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>

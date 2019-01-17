@@ -6,6 +6,8 @@ var Game = require('bc19/game')
 var SPECS = require('bc19/specs');
 var ActionRecord = require('bc19/action_record');
 
+var MersenneTwister = require('mersenne-twister');
+
 var UNIT_NAMES = [
     'Castle',
     'Church',
@@ -33,6 +35,42 @@ Sword by uzeir syarief from the Noun Project
 sniper by rizqa anindita from the Noun Project
 Tank by Sandhi Priyasmoro from the Noun Project
 */
+
+function patch() {
+    // allow us to access bound objects so we can copy the random state
+    var _bind = Function.prototype.apply.bind(Function.prototype.bind);
+    Object.defineProperty(Function.prototype, 'bind', {
+        value: function(obj) {
+            var boundFunction = _bind(this, arguments);
+            boundFunction.boundObject = obj;
+            return boundFunction;
+        }
+    });
+}
+patch();
+
+function deep_copy(game) {
+    // this step keeps a reference to the same mersenne-twister
+    var m = JSON.parse(JSON.stringify(game.random.boundObject));
+
+    var c = game.copy();
+
+    // check if this was before the MersenneTwister update:
+    if (game.random.boundObject.constructor.name != "MersenneTwister") {
+        return c;
+    }
+
+    var generator = new MersenneTwister();
+
+    var keys = Object.keys(m);
+    for (var i = 0; i < keys.length; ++i) {
+        generator[keys[i]] = m[keys[i]];
+    }
+
+    c.random = generator.random.bind(generator);
+
+    return c;
+}
 
 class Veww {
     process_replay(replay) {
@@ -68,7 +106,7 @@ class Veww {
         this.seed = 0;
         for (let i = 0; i<4; i++) this.seed += (this.replay[i+2] << (24-8*i));
 
-        console.log('seed: ' + this.seed);
+        document.getElementById('replay_seed').innerText = this.seed;
 
         this.game = new Game(this.seed, 0, 0, false, false);
 
@@ -77,7 +115,7 @@ class Veww {
 
         // checkpoints is of the type [(int) turn, (Game) checkpoint]
         // checkpoints[i] is the round i
-        this.checkpoints = [[0, this.game.copy()]];
+        this.checkpoints = [[0, this.game]];
 
         // check if we ran into that bug
         if (this.checkpoints[0][1].robots.length == 0) {
@@ -97,6 +135,15 @@ class Veww {
         document.getElementById('game_max_turns').innerText = this.max_turns;
         document.getElementById('game_max_rounds').innerText = this.num_rounds;
         document.getElementById('game_max_robins').innerText = this.robin_per_round[0];
+
+        var set_turn = document.getElementById('input_set_turn');
+        var set_round = document.getElementById('input_set_round');
+        var range_set_turn = document.getElementById('input_range_set_turn');
+        var range_set_round = document.getElementById('input_range_set_round');
+        set_turn.min = range_set_turn.min = 0;
+        set_turn.max = range_set_turn.max = this.max_turns;
+        set_turn.min = range_set_round.min = 0;
+        set_turn.max = range_set_round.max = this.num_rounds;
 
         console.log(this.game);
 
@@ -122,7 +169,7 @@ class Veww {
      */
     create_checkpoints() {
         // first round
-        var checkpoint = this.checkpoints[0][1].copy();
+        var checkpoint = deep_copy(this.checkpoints[0][1]);
         var robin = 0;
 
         this.robin_per_round = [0];
@@ -133,7 +180,7 @@ class Veww {
             checkpoint.enactTurn(diff);
 
             if (checkpoint.robin == 1) {
-                this.checkpoints.push([i+1, checkpoint.copy()]);
+                this.checkpoints.push([i+1, deep_copy(checkpoint)]);
 
                 // keep track of how many robots there were
                 this.robin_per_round.push(robin);
@@ -173,7 +220,7 @@ class Veww {
         round -= 1;
 
         // load the round
-        var checkpoint = this.checkpoints[round][1].copy();
+        var checkpoint = deep_copy(this.checkpoints[round][1]);
         var robin = 0;
 
         // track dead robots
@@ -244,15 +291,6 @@ class Veww {
         }
     }
 
-    next_turn_norender() {
-        // cancel autoplay if we reach the end
-        if (this.current_turn >= this.max_turns && this.is_playing) {
-            this.stop_autoplay();
-        } else {
-            this.jump_to_turn(this.current_turn + 1);
-        }
-    }
-
     next_turn() {
         // cancel autoplay if we reach the end
         if (this.current_turn >= this.max_turns && this.is_playing) {
@@ -286,11 +324,9 @@ class Veww {
             return;
         }
 
-        while (curr_time > this.last_turn_time + this.autoplay_delay) {
-            this.last_turn_time += this.autoplay_delay;
-            this.next_turn_norender();
-        }
-
+        var num_turns_elapsed = Math.ceil((curr_time - this.last_turn_time) / this.autoplay_delay);
+        this.last_turn_time += num_turns_elapsed * this.autoplay_delay;
+        this.jump_to_turn(Math.min(this.current_turn + num_turns_elapsed, this.max_turns));
         this.render();
 
         if (this.current_turn < this.max_turns) {
@@ -311,6 +347,10 @@ class Veww {
         document.getElementById('btn_prev_round').classList.add('disabled')
         document.getElementById('btn_next_robin').classList.add('disabled')
         document.getElementById('btn_prev_robin').classList.add('disabled')
+
+        // disable slider inputs
+        document.getElementById('input_range_set_turn').disabled = true
+        document.getElementById('input_range_set_round').disabled = true
 
         // configure start/stop
         document.getElementById('btn_start_autoplay').classList.add('disabled')
@@ -335,6 +375,10 @@ class Veww {
         document.getElementById('btn_prev_round').classList.remove('disabled')
         document.getElementById('btn_next_robin').classList.remove('disabled')
         document.getElementById('btn_prev_robin').classList.remove('disabled')
+
+        // enable slider inputs
+        document.getElementById('input_range_set_turn').disabled = false
+        document.getElementById('input_range_set_round').disabled = false
 
         // configure start/stop
         document.getElementById('btn_start_autoplay').classList.remove('disabled')
@@ -701,6 +745,9 @@ class Veww {
         document.getElementById('game_curr_robin').innerText = this.current_robin;
         document.getElementById('game_max_robins').innerText = this.robin_per_round[this.current_round];
 
+        document.getElementById('input_range_set_turn').value = this.current_turn;
+        document.getElementById('input_range_set_round').value = this.current_round;
+
         document.getElementById('game_red_fuel').innerText = this.current_game.fuel[0];
         document.getElementById('game_blue_fuel').innerText = this.current_game.fuel[1];
         document.getElementById('game_red_karbonite').innerText = this.current_game.karbonite[0];
@@ -837,6 +884,14 @@ function load_replay() {
             window.location.href = '/settings';
         }
     });
+
+    fetch('/replay_path').then(function(resp) {
+        if (resp.ok) {
+            resp.text().then(function(resp) {
+                document.getElementById('replay_path').innerText = resp;
+            });
+        }
+    });
 }
 
 load_replay();
@@ -845,7 +900,7 @@ load_replay();
 var socket = io();
 socket.on('file_update', load_replay);
 
-// add click listeners
+// add click / slider / radio listeners
 document.getElementById('btn_next_turn').onclick = function(){
     if (!veww.is_playing) veww.next_turn();
 }
@@ -885,12 +940,38 @@ document.getElementById('btn_jump_start').onclick = function(){
     }
 }
 
+document.getElementById('input_set_speed').oninput = function() {
+    veww.autoplay_delay = Math.pow(1000 / parseInt(this.value), 4.32817);
+}
+
+Array.from(document.getElementById('radio_select_input_type').children).forEach(function(elem) {
+    elem.children[0].onchange = function() {
+        if (this.value == 'number') {
+            document.getElementById('input_range_set_turn').parentElement.classList.add('hidden');
+            document.getElementById('input_range_set_round').parentElement.classList.add('hidden');
+            document.getElementById('input_set_turn').parentElement.classList.remove('hidden');
+            document.getElementById('input_set_round').parentElement.classList.remove('hidden');
+        } else if (this.value == 'range') {
+            document.getElementById('input_set_turn').parentElement.classList.add('hidden');
+            document.getElementById('input_set_round').parentElement.classList.add('hidden');
+            document.getElementById('input_range_set_turn').parentElement.classList.remove('hidden');
+            document.getElementById('input_range_set_round').parentElement.classList.remove('hidden');
+        }
+    }
+});
+
 document.getElementById('btn_set_turn').onclick = function(){
     if (!veww.is_playing) {
         var turn = parseInt(document.getElementById('input_set_turn').value);
         veww.jump_to_turn(turn);
         veww.render();
     }
+}
+
+document.getElementById('input_range_set_turn').oninput = function() {
+    var turn = parseInt(this.value);
+    veww.jump_to_turn(turn);
+    veww.render();
 }
 
 document.getElementById('btn_set_round').onclick = function(){
@@ -901,9 +982,10 @@ document.getElementById('btn_set_round').onclick = function(){
     }
 }
 
-// add slider listener
-document.getElementById('input_set_speed').oninput = function() {
-    veww.autoplay_delay = 1000 / parseInt(this.value);
+document.getElementById('input_range_set_round').oninput = function() {
+    var round = parseInt(this.value);
+    veww.jump_to_round_robin(round, 1);
+    veww.render();
 }
 
 document.getElementById('btn_switch_bc19_version').onclick = function(){

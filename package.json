@@ -8,10 +8,11 @@
   },
   "author": "hgarrereyn",
   "dependencies": {
-    "bc19": "^0.3.18",
+    "bc19": "^0.3.20",
     "browserify": "^16.2.3",
+    "connect-busboy": "0.0.2",
     "express": "^4.16.4",
-    "nodemon": "^1.18.9",
+    "mersenne-twister": "^1.1.0",
     "npm": "^6.5.0",
     "npm-api": "^0.4.12",
     "socket.io": "^2.2.0",
