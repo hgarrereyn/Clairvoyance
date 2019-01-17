@@ -7,7 +7,11 @@ var SPECS = require('bc19/specs');
 var ActionRecord = require('bc19/action_record');
 
 var MersenneTwister = require('mersenne-twister');
-
+/**
+ * so that render knows which hilights to erase upon hovering over another square.
+ * is a [y, x] list
+ */
+var hilightsToErase = [];
 var UNIT_NAMES = [
     'Castle',
     'Church',
@@ -551,6 +555,47 @@ class Veww {
         }
     }
 
+    /*
+     * Given a radius, returns all offsets [dy, dx] in that radius
+     */
+    getOffsetsInRange(radius) {
+        var offsetsInRange = [];
+        var biggestStraightMove = 0;
+        while ((biggestStraightMove + 1) ** 2 <= radius) {
+          biggestStraightMove += 1;
+        }
+        for (var xMove = -biggestStraightMove; xMove <= biggestStraightMove; xMove++) {
+          for(var yMove = 0; (xMove ** 2) + (yMove ** 2) <= radius; yMove++) {
+            if( !((yMove === 0) && (xMove === 0)) ) {
+              offsetsInRange.push([yMove, xMove]);
+            }
+            if(yMove !== 0) {
+              offsetsInRange.push([-yMove, xMove]);
+            }
+          }
+        }
+        return offsetsInRange;
+      }
+
+      /*
+       * Given a start location and radius, returns all
+       * offsets [dx, dy] of passable squares on map within that radius
+       */
+      getPassableOffsets(startX, startY, radius, map) {
+          let offsetsInRange = this.getOffsetsInRange(radius);
+          return offsetsInRange.filter(function(offset) {
+            var yLoc = startY + offset[0];
+            var xLoc = startX + offset[1];
+            if( yLoc >= map.length || yLoc < 0) {
+              return false;
+            }
+            if( xLoc >= map.length || xLoc < 0) {
+              return false;
+            }
+            return map[yLoc][xLoc];
+          });
+        }
+
     /**
      * Renders the game to the canvas
      */
@@ -564,6 +609,14 @@ class Veww {
         // hover coordinate
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
+        /*
+         * WARNING: I made new global variable, hilightsToErase, so the
+         *          function knows which hilights to erase upon moving into next square
+         */
+        hilightsToErase.forEach(function(hilight) {
+          this.fillSquare(hilight[1], hilight[0]);
+        }.bind(this));
+        hilightsToErase = [];
 
         //redVision 0xFA7575 redAttack 0x800303
         //blue vision 0x7686FD blue attack 0x0014A7 with outlines
@@ -586,42 +639,39 @@ class Veww {
             break;
           }
         }
-        let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
         let wantsVisible = document.getElementById("shadeVisible").checked;
         let wantsAttackable = document.getElementById("shadeAttackable").checked;
         let wantsMovable = document.getElementById("shadeMovable").checked;
-        console.log("Vision radius of robot is: " + vision);
-        for(let gridX = 0; gridX < this.size; gridX++) {
-          for(let gridY = 0; gridY < this.size; gridY++) {
-            let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2
-            if( found && (radius <= vision) && this.current_game.map[gridY][gridX]) {
-              //since vision radius is >= than attack or move radius for all units, this is okay
+        if(found && (wantsMovable || wantsVisible || wantsAttackable)) {
+          let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+          //since vision radius is >= than attack or move radius for all units, this is okay
+          let offsets = this.getPassableOffsets(robot.x, robot.y, vision, this.current_game.map);
+          offsets.forEach(function(offset) {
+            let gridY = offset[0] + robot.y;
+            let gridX = offset[1] + robot.x;
+            let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2;
+            if(wantsVisible) {
               let visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
-              if(wantsVisible) {
-                this.graphics.beginFill(visionColor);
-              }
-              let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
-              if(attack && (radius <= vision) && (attack[0] <= radius) && (radius <= attack[1]) && wantsAttackable) {
-                let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
-                this.graphics.beginFill(attackColor);
-              }
-              let move = SPECS.UNITS[robot.unit].SPEED;
-              if(move > 0 && wantsMovable && radius <= move) {
-                let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
-                //this.graphics.beginFill(moveColor);
-                this.outlineSquare(moveColor, gridX, gridY);
-              }
-              let gx = gridX * (GRID_SIZE + GRID_SPACING);
-              let gy = gridY * (GRID_SIZE + GRID_SPACING);
-              this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-              this.graphics.endFill();
+              this.graphics.beginFill(visionColor);
+              hilightsToErase.push([gridY, gridX]);
             }
-            else {
-              this.fillSquare(gridX, gridY);
+            let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
+            if(attack && (attack[0] <= radius) && (radius <= attack[1]) && wantsAttackable) {
+              let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
+              this.graphics.beginFill(attackColor);
+              hilightsToErase.push([gridY, gridX]);
             }
-          }
+            let move = SPECS.UNITS[robot.unit].SPEED;
+            if(move > 0 && wantsMovable && radius <= move) {
+              let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
+              this.outlineSquare(moveColor, gridX, gridY);
+            }
+            let gx = gridX * (GRID_SIZE + GRID_SPACING);
+            let gy = gridY * (GRID_SIZE + GRID_SPACING);
+            this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+            this.graphics.endFill();
+          }.bind(this));
         }
-
         this.outlineSquare(0x9e42f4, x, y);
 
         // hide all units
