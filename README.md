@@ -56,8 +56,13 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * view the replay seed
 * Live-switch between versions of bc19 in the browser
     * scrim replays work!
+* Display options (thanks to RyanSharafuddin)
+    * Can show a robot's moveable, attackable, or visible squares on hover
 
 # Version History
+
+## 1.0.2 (1/19/19)
+* show movable, attackable and visible squares for a unit on hover
 
 ## 1.0.1 (1/15/19)
 * added option to upload replay files to view
