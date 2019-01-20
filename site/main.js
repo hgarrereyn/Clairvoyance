@@ -801,6 +801,9 @@ class Veww {
         var red_units = 0;
         var blue_units = 0;
 
+        var red_unit_value = 0;
+        var blue_unit_value = 0;
+
         // turn queue
         var html = '';
 
@@ -819,8 +822,10 @@ class Veww {
 
             if (robot.team == 0) {
                 red_units += 1;
+                red_unit_value += SPECS.UNITS[robot.unit].CONSTRUCTION_KARBONITE;
             } else {
                 blue_units += 1;
+                blue_unit_value += SPECS.UNITS[robot.unit].CONSTRUCTION_KARBONITE;
             }
         }
         document.getElementById('turn_queue').innerHTML = html;
@@ -855,6 +860,13 @@ class Veww {
 
         document.getElementById('units_blue').innerText = blue_units;
         document.getElementById('units_blue').style.width = (blue_units / (red_units+blue_units) * 100) + '%';
+
+        // unit bars
+        document.getElementById('unit_value_red').innerText = red_unit_value;
+        document.getElementById('unit_value_red').style.width = (red_unit_value / (red_unit_value+blue_unit_value) * 100) + '%';
+
+        document.getElementById('unit_value_blue').innerText = blue_unit_value;
+        document.getElementById('unit_value_blue').style.width = (blue_unit_value / (red_unit_value+blue_unit_value) * 100) + '%';
     }
 
     write_tooltip() {

@@ -61,6 +61,9 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 
 # Version History
 
+## 1.0.5 (1/20/19)
+* add unit value bar (based on construction karbonite cost)
+
 ## 1.0.4 (1/20/19)
 * show bars for health, karbonite, fuel and units
 
