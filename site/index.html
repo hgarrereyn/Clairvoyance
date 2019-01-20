@@ -52,8 +52,55 @@
             </div>
         </div>
 
+        <div id='health'>
+            <div class='row'>
+                <div class='col-auto'>Red</div>
+                <div class='col-5 align-self-center'>
+                    <div class="progress" style='height:15px; flex-direction: row-reverse;'>
+                        <div id='health_red' class="progress-bar red-bar" role="progressbar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class='col-5 align-self-center'>
+                    <div class="progress" style='height:15px;'>
+                        <div id='health_blue' class="progress-bar blue-bar" role="progressbar" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class='col-auto'>Blue</div>
+            </div>
+        </div>
+
+        <div id='stats'>
+            <div class='row'>
+                <div class='col-2'>Karbonite</div>
+                <div class='col-10 align-self-center'>
+                    <div class="progress" style='height:15px;'>
+                        <div id='karbonite_red' class="progress-bar red-bar" role="progressbar" style="width: 50%;"></div>
+                        <div id='karbonite_blue' class="progress-bar blue-bar" role="progressbar" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-2'>Fuel</div>
+                <div class='col-10 align-self-center'>
+                    <div class="progress" style='height:15px;'>
+                        <div id='fuel_red' class="progress-bar red-bar" role="progressbar" style="width: 50%;"></div>
+                        <div id='fuel_blue' class="progress-bar blue-bar" role="progressbar" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-2'>Units</div>
+                <div class='col-10 align-self-center'>
+                    <div class="progress" style='height:15px;'>
+                        <div id='units_red' class="progress-bar red-bar" role="progressbar" style="width: 50%;"></div>
+                        <div id='units_blue' class="progress-bar blue-bar" role="progressbar" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id='controls'>
-            <h2>Clairvoyance <small>v1.0.3</small></h2>
+            <h2>Clairvoyance <small>v1.0.4</small></h2>
             <h6>
                 Unofficial bc19 replay viewer by hgarrereyn 
                 <br> 
@@ -257,20 +304,6 @@
                             <div class="slider round"></div>
                         </label>
                     </div>
-                </div>
-            </div>
-
-            <hr/>
-            <h3>Resources:</h3>
-
-            <div class='row display-panel'>
-                <div class='col-6 red-team'>
-                    <p>Fuel: <span id='game_red_fuel' class='dyn_val'>0</span></p>
-                    <p>Karbonite: <span id='game_red_karbonite' class='dyn_val'>0</span></p>
-                </div>
-                <div class='col-6 blue-team'>
-                    <p>Fuel: <span id='game_blue_fuel' class='dyn_val'>0</span></p>
-                    <p>Karbonite: <span id='game_blue_karbonite' class='dyn_val'>0</span></p>
                 </div>
             </div>
 

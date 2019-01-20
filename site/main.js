@@ -135,6 +135,7 @@ class Veww {
         this.current_turn = 0;
         this.current_round = 0;
         this.current_robin = 0;
+        this.max_health = (this.current_game.robots.length / 2) * SPECS.UNITS[0].STARTING_HP;
 
         document.getElementById('game_max_turns').innerText = this.max_turns;
         document.getElementById('game_max_rounds').innerText = this.num_rounds;
@@ -794,10 +795,11 @@ class Veww {
         document.getElementById('input_range_set_turn').value = this.current_turn;
         document.getElementById('input_range_set_round').value = this.current_round;
 
-        document.getElementById('game_red_fuel').innerText = this.current_game.fuel[0];
-        document.getElementById('game_blue_fuel').innerText = this.current_game.fuel[1];
-        document.getElementById('game_red_karbonite').innerText = this.current_game.karbonite[0];
-        document.getElementById('game_blue_karbonite').innerText = this.current_game.karbonite[1];
+        var red_health = 0;
+        var blue_health = 0;
+
+        var red_units = 0;
+        var blue_units = 0;
 
         // turn queue
         var html = '';
@@ -806,8 +808,53 @@ class Veww {
             var robot = this.current_game.robots[i];
             var color = robot.team == 0 ? 'red' : 'blue';
             html += `<p class='selectable ${color}' onmouseover=veww.select_unit(${i})>${i+1}: ${UNIT_NAMES[robot.unit]} [${robot.id}]</p>`
+        
+            if (robot.unit == SPECS.CASTLE) {
+                if (robot.team == 0) {
+                    red_health += robot.health;
+                } else {
+                    blue_health += robot.health;
+                }
+            }
+
+            if (robot.team == 0) {
+                red_units += 1;
+            } else {
+                blue_units += 1;
+            }
         }
         document.getElementById('turn_queue').innerHTML = html;
+
+        var red_health_percentage = red_health / this.max_health;
+        var blue_health_percentage = blue_health / this.max_health;
+
+        // health bars
+        document.getElementById('health_red').innerText = red_health;
+        document.getElementById('health_red').style.width = (red_health_percentage * 100) + '%';
+
+        document.getElementById('health_blue').innerText = blue_health;
+        document.getElementById('health_blue').style.width = (blue_health_percentage * 100) + '%';
+
+        // karbonite bars
+        document.getElementById('karbonite_red').innerText = this.current_game.karbonite[0];
+        document.getElementById('karbonite_red').style.width = (this.current_game.karbonite[0] / (this.current_game.karbonite[0]+this.current_game.karbonite[1]) * 100) + '%';
+
+        document.getElementById('karbonite_blue').innerText = this.current_game.karbonite[1];
+        document.getElementById('karbonite_blue').style.width = (this.current_game.karbonite[1] / (this.current_game.karbonite[0]+this.current_game.karbonite[1]) * 100) + '%';
+
+        // fuel bars
+        document.getElementById('fuel_red').innerText = this.current_game.fuel[0];
+        document.getElementById('fuel_red').style.width = (this.current_game.fuel[0] / (this.current_game.fuel[0]+this.current_game.fuel[1]) * 100) + '%';
+
+        document.getElementById('fuel_blue').innerText = this.current_game.fuel[1];
+        document.getElementById('fuel_blue').style.width = (this.current_game.fuel[1] / (this.current_game.fuel[0]+this.current_game.fuel[1]) * 100) + '%';
+
+        // unit bars
+        document.getElementById('units_red').innerText = red_units;
+        document.getElementById('units_red').style.width = (red_units / (red_units+blue_units) * 100) + '%';
+
+        document.getElementById('units_blue').innerText = blue_units;
+        document.getElementById('units_blue').style.width = (blue_units / (red_units+blue_units) * 100) + '%';
     }
 
     write_tooltip() {

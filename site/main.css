@@ -26,6 +26,36 @@ body {
     overflow-y: scroll;
 }
 
+#stats {
+    position: absolute;
+    bottom: 0px;
+    left: 210px;
+    right: 510px;
+    padding: 20px;
+
+    background-color: rgba(255,255,255,0.9);
+    border: 2px solid lightcyan;
+}
+
+#health {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 500px;
+    padding: 10px;
+
+    background-color: rgba(255,255,255,0.9);
+    border-bottom: 2px solid lightcyan;
+}
+
+.red-bar {
+    background-color: red;
+}
+
+.blue-bar {
+    background-color: blue;
+}
+
 input[type=range] {
     -webkit-appearance: none;
     -moz-appearance: none;

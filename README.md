@@ -52,7 +52,7 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 * Turn queue
     * see the order that robots will run
 * Stats
-    * view fuel and karbonite per team
+    * bars to display total castle health, karbonite, fuel and number of units
     * view the replay seed
 * Live-switch between versions of bc19 in the browser
     * scrim replays work!
@@ -60,6 +60,9 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
     * Can show a robot's moveable, attackable, or visible squares on hover
 
 # Version History
+
+## 1.0.4 (1/20/19)
+* show bars for health, karbonite, fuel and units
 
 ## 1.0.3 (1/19/19)
 * show signal radius in tooltip (thanks to j-mao)
