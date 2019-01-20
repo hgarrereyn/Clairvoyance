@@ -53,8 +53,16 @@
         </div>
 
         <div id='controls'>
-            <h2>Clairvoyance</h2>
-            <h6>Unofficial bc19 replay viewer by hgarrereyn <br> Display Options feature by Ryan Sharafuddin (Fuddin)</h6>
+            <h2>Clairvoyance <small>v1.0.2</small></h2>
+            <h6>
+                Unofficial bc19 replay viewer by hgarrereyn 
+                <br> 
+                <br>
+                <ul>
+                    <li>Slider control/URL upload by ChiCubed</li>
+                    <li>Display Options feature by Ryan Sharafuddin (Fuddin)</li>
+                </ul>
+            </h6>
             <a href='/settings'>Configuration...</a>
 
             <hr/>
@@ -99,7 +107,7 @@
                 <div class='col-auto'>
                     <button id='btn_prev_turn' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
-                <div class='col-3 align-self-center'>
+                <div class='col-5 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_turn' class='dyn_val'>0</span> / <span id='game_max_turns'>0</span></p>
                 </div>
                 <div class='col-auto'>
@@ -114,7 +122,7 @@
                 <div class='col-auto'>
                     <button id='btn_prev_round' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
-                <div class='col-3 align-self-center'>
+                <div class='col-5 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_round' class='dyn_val'>0</span> / <span id='game_max_rounds'>0</span></p>
                 </div>
                 <div class='col-auto'>
@@ -129,7 +137,7 @@
                 <div class='col-auto'>
                     <button id='btn_prev_robin' type="button" class="btn btn-primary btn-sm">&lt; Prev</button>
                 </div>
-                <div class='col-3 align-self-center'>
+                <div class='col-5 align-self-center'>
                     <p class='no-margin text-center'><span id='game_curr_robin' class='dyn_val'>0</span> / <span id='game_max_robins'>0</span></p>
                 </div>
                 <div class='col-auto'>
@@ -218,38 +226,38 @@
 
             <hr/>
             <div>
-              <h3>Display Options</h3>
-              <div id="allSliders">
-                <div class="sliderLabelContainer">
-                  <p class="sliderLabel">Outline movable:</p>
-                </div>
-                <div class="container">
-                  <label class="switch" for="shadeMovable">
-                    <input type="checkbox" id="shadeMovable"/>
-                    <div class="slider round"></div>
-                  </label>
-                </div>
+                <h3>Display Options</h3>
+                <div id="allSliders">
+                    <div class="sliderLabelContainer">
+                        <p class="sliderLabel">Dot movable:</p>
+                    </div>
+                    <div class="container">
+                        <label class="switch" for="shadeMovable">
+                            <input type="checkbox" id="shadeMovable" checked/>
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
 
-                <div class="sliderLabelContainer">
-                  <p class="sliderLabel">Shade attackable:</p>
-                </div>
-                <div class="container">
-                  <label class="switch" for="shadeAttackable">
-                    <input type="checkbox" id="shadeAttackable" checked />
-                    <div class="slider round"></div>
-                  </label>
-                </div>
+                    <div class="sliderLabelContainer">
+                        <p class="sliderLabel">Shade attackable:</p>
+                    </div>
+                    <div class="container">
+                        <label class="switch" for="shadeAttackable">
+                            <input type="checkbox" id="shadeAttackable" checked />
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
 
-                <div class="sliderLabelContainer">
-                  <p class="sliderLabel">Shade visible:</p>
+                    <div class="sliderLabelContainer">
+                        <p class="sliderLabel">Shade visible:</p>
+                    </div>
+                    <div class="container">
+                        <label class="switch" for="shadeVisible">
+                            <input type="checkbox" id="shadeVisible" checked/>
+                            <div class="slider round"></div>
+                        </label>
+                    </div>
                 </div>
-                <div class="container">
-                  <label class="switch" for="shadeVisible">
-                    <input type="checkbox" id="shadeVisible" checked/>
-                    <div class="slider round"></div>
-                  </label>
-                </div>
-              </div>
             </div>
 
             <hr/>
@@ -277,11 +285,6 @@
             </div>
 
         </div>
-
-        <!-- Bootstrap -->
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
         <!-- Canvas drawing library -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>

@@ -418,6 +418,9 @@ class Veww {
         this.graphics = new PIXI.Graphics();
         this.grid.addChild(this.graphics);
 
+        this.grid_overlay = new PIXI.Graphics();
+        this.grid.addChild(this.grid_overlay);
+
         this.unit_health = new PIXI.Graphics();
         this.grid.addChild(this.unit_health);
 
@@ -499,7 +502,6 @@ class Veww {
 
         // scroll to zoom
         document.getElementById('game').addEventListener('wheel', function(event) {
-
             // calculate target position in the grid's coordinate frame
             var px = event.x - this.grid.position.x;
             var py = event.y - this.grid.position.y;
@@ -514,35 +516,22 @@ class Veww {
         }.bind(this));
     }
 
-    fillSquare(x, y) {
-      //fills square with default color fills
-      // determine tile color
-      if (this.current_game.karbonite_map[y][x]) {
-          this.graphics.beginFill(0x00ff00);
-      } else if (this.current_game.fuel_map[y][x]) {
-          this.graphics.beginFill(0xffff00);
-      } else if (this.current_game.map[y][x]) {
-          this.graphics.beginFill(0xcccccc);
-      } else {
-          this.graphics.beginFill(0x111111);
-      }
-
-      // calculate grid position
-      var gx = x * (GRID_SIZE + GRID_SPACING);
-      var gy = y * (GRID_SIZE + GRID_SPACING);
-
-      // draw it
-      this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-      this.graphics.endFill();
+    dot_square(x, y) {
+        this.grid_overlay.beginFill(0x111111, 0.5);
+        var gx = x * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+        var gy = y * (GRID_SIZE + GRID_SPACING) + (GRID_SIZE/2);
+        this.grid_overlay.drawCircle(gx,gy,GRID_SIZE/6)
+        this.grid_overlay.endFill();
     }
 
-    outlineSquare(color, x, y) {
-      this.dyn_graphics.beginFill(color);
-      var gx = x * (GRID_SIZE + GRID_SPACING);
-      var gy = y * (GRID_SIZE + GRID_SPACING);
-      this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
-      this.dyn_graphics.endFill();
+    outline_square(color, x, y) {
+        this.dyn_graphics.beginFill(color);
+        var gx = x * (GRID_SIZE + GRID_SPACING);
+        var gy = y * (GRID_SIZE + GRID_SPACING);
+        this.dyn_graphics.drawRect(gx-GRID_SPACING,gy-GRID_SPACING,GRID_SIZE+(2*GRID_SPACING),GRID_SIZE+(2*GRID_SPACING));
+        this.dyn_graphics.endFill();
     }
+
     // we can do this just once per game
     draw_grid() {
         this.graphics.clear();
@@ -550,7 +539,24 @@ class Veww {
         // render tiles
         for (var y = 0; y < this.size; ++y) {
             for (var x = 0; x < this.size; ++x) {
-              this.fillSquare(x,y);
+                // determine tile color
+                if (this.current_game.karbonite_map[y][x]) {
+                    this.graphics.beginFill(0x00ff00);
+                } else if (this.current_game.fuel_map[y][x]) {
+                    this.graphics.beginFill(0xffff00);
+                } else if (this.current_game.map[y][x]) {
+                    this.graphics.beginFill(0xcccccc);
+                } else {
+                    this.graphics.beginFill(0x111111);
+                }
+
+                // calculate grid position
+                var gx = x * (GRID_SIZE + GRID_SPACING);
+                var gy = y * (GRID_SIZE + GRID_SPACING);
+
+                // draw it
+                this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+                this.graphics.endFill();
             }
         }
     }
@@ -561,40 +567,43 @@ class Veww {
     getOffsetsInRange(radius) {
         var offsetsInRange = [];
         var biggestStraightMove = 0;
-        while ((biggestStraightMove + 1) ** 2 <= radius) {
-          biggestStraightMove += 1;
-        }
-        for (var xMove = -biggestStraightMove; xMove <= biggestStraightMove; xMove++) {
-          for(var yMove = 0; (xMove ** 2) + (yMove ** 2) <= radius; yMove++) {
-            if( !((yMove === 0) && (xMove === 0)) ) {
-              offsetsInRange.push([yMove, xMove]);
-            }
-            if(yMove !== 0) {
-              offsetsInRange.push([-yMove, xMove]);
-            }
-          }
-        }
-        return offsetsInRange;
-      }
 
-      /*
-       * Given a start location and radius, returns all
-       * offsets [dx, dy] of passable squares on map within that radius
-       */
-      getPassableOffsets(startX, startY, radius, map) {
-          let offsetsInRange = this.getOffsetsInRange(radius);
-          return offsetsInRange.filter(function(offset) {
+        while ((biggestStraightMove + 1) ** 2 <= radius) {
+            biggestStraightMove += 1;
+        }
+
+        for (var xMove = -biggestStraightMove; xMove <= biggestStraightMove; xMove++) {
+            for(var yMove = 0; (xMove ** 2) + (yMove ** 2) <= radius; yMove++) {
+                if( !((yMove === 0) && (xMove === 0)) ) {
+                    offsetsInRange.push([yMove, xMove]);
+                }
+                if(yMove !== 0) {
+                    offsetsInRange.push([-yMove, xMove]);
+                }
+            }
+        }
+
+        return offsetsInRange;
+    }
+
+    /*
+    * Given a start location and radius, returns all
+    * offsets [dx, dy] of passable squares on map within that radius
+    */
+    getPassableOffsets(startX, startY, radius, map) {
+        let offsetsInRange = this.getOffsetsInRange(radius);
+        return offsetsInRange.filter(function(offset) {
             var yLoc = startY + offset[0];
             var xLoc = startX + offset[1];
-            if( yLoc >= map.length || yLoc < 0) {
-              return false;
-            }
-            if( xLoc >= map.length || xLoc < 0) {
-              return false;
-            }
+                if( yLoc >= map.length || yLoc < 0) {
+                    return false;
+                }
+                if( xLoc >= map.length || xLoc < 0) {
+                    return false;
+                }
             return map[yLoc][xLoc];
-          });
-        }
+        });
+    }
 
     /**
      * Renders the game to the canvas
@@ -604,75 +613,15 @@ class Veww {
 
         // clear the graphics so we can redraw
         this.dyn_graphics.clear();
+        this.grid_overlay.clear();
         this.unit_health.clear();
 
         // hover coordinate
         var x = this.hover_coordinate[0];
         var y = this.hover_coordinate[1];
-        /*
-         * WARNING: I made new global variable, hilightsToErase, so the
-         *          function knows which hilights to erase upon moving into next square
-         */
-        hilightsToErase.forEach(function(hilight) {
-          this.fillSquare(hilight[1], hilight[0]);
-        }.bind(this));
-        hilightsToErase = [];
 
-        //redVision 0xFA7575 redAttack 0x800303
-        //blue vision 0x7686FD blue attack 0x0014A7 with outlines
-        // 0x000852 0x0014da 0x7686FD  move attack vision
-        // 0x550000  0xd60000  0xf49f9f move attack vision  with all 3 shading
-        let redVisionColor = 0xf49f9f;
-        let blueVisionColor = 0x7686FD;// 0x115CFC 0x4D62FE 0x7686FD
-        let redAttackColor = 0x710000; //0xd60000  0xf49f9f 0x710000
-        let blueAttackColor = 0x001087; // 0x0014A7 0x4971ff 0x001087 0x000e79 0x001296
-        let redMoveColor = 0x550000;
-        let blueMoveColor = 0x000000; // 0x001aaa 0x0014da 0x001296
-        let hoverX = x; // 0x000000 0x0014da  0x7686FD
-        let hoverY = y;
-        let found = false
-        for (var i = 0; i < this.round_bots.length; ++i) {
-          var robot = this.round_bots[i][0];
-          var is_dead = this.round_bots[i][1];
-          if(!is_dead && robot.x == hoverX && robot.y == hoverY) {
-            found = true;
-            break;
-          }
-        }
-        let wantsVisible = document.getElementById("shadeVisible").checked;
-        let wantsAttackable = document.getElementById("shadeAttackable").checked;
-        let wantsMovable = document.getElementById("shadeMovable").checked;
-        if(found && (wantsMovable || wantsVisible || wantsAttackable)) {
-          let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
-          //since vision radius is >= than attack or move radius for all units, this is okay
-          let offsets = this.getPassableOffsets(robot.x, robot.y, vision, this.current_game.map);
-          offsets.forEach(function(offset) {
-            let gridY = offset[0] + robot.y;
-            let gridX = offset[1] + robot.x;
-            let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2;
-            if(wantsVisible) {
-              let visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
-              this.graphics.beginFill(visionColor);
-              hilightsToErase.push([gridY, gridX]);
-            }
-            let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
-            if(attack && (attack[0] <= radius) && (radius <= attack[1]) && wantsAttackable) {
-              let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
-              this.graphics.beginFill(attackColor);
-              hilightsToErase.push([gridY, gridX]);
-            }
-            let move = SPECS.UNITS[robot.unit].SPEED;
-            if(move > 0 && wantsMovable && radius <= move) {
-              let moveColor = (robot.team == 0) ? redMoveColor : blueMoveColor;
-              this.outlineSquare(moveColor, gridX, gridY);
-            }
-            let gx = gridX * (GRID_SIZE + GRID_SPACING);
-            let gy = gridY * (GRID_SIZE + GRID_SPACING);
-            this.graphics.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
-            this.graphics.endFill();
-          }.bind(this));
-        }
-        this.outlineSquare(0x9e42f4, x, y);
+        // draw selection box
+        this.outline_square(0x9e42f4, x, y);
 
         // hide all units
         for (var i = 0; i < 6; ++i) {
@@ -715,7 +664,7 @@ class Veww {
             }
 
             // display robot health in tile border
-            var health_percentage = robot.health / SPECS.UNITS[robot.unit].STARTING_HP;
+            var health_percentage = Math.max(robot.health / SPECS.UNITS[robot.unit].STARTING_HP, 0);
 
             if (health_percentage < 1) {
                 // make space
@@ -734,6 +683,53 @@ class Veww {
         this.write_stats();
         this.write_tooltip();
         this.render_action();
+    }
+
+    render_grid_overlay(robot) {
+        // overlay colors
+        let redVisionColor = 0xf49f9f;
+        let blueVisionColor = 0x7686FD;
+        let redAttackColor = 0x710000;
+        let blueAttackColor = 0x001087;
+
+        // overlay options
+        let wantsVisible = document.getElementById("shadeVisible").checked;
+        let wantsAttackable = document.getElementById("shadeAttackable").checked;
+        let wantsMovable = document.getElementById("shadeMovable").checked;
+
+        if (wantsMovable || wantsVisible || wantsAttackable) {
+            let vision = SPECS.UNITS[robot.unit].VISION_RADIUS;
+
+            //since vision radius is >= than attack or move radius for all units, this is okay
+            let offsets = this.getPassableOffsets(robot.x, robot.y, vision, this.current_game.map);
+            offsets.forEach(function(offset) {
+                // calculate grid position of this offset
+                let gridY = offset[0] + robot.y;
+                let gridX = offset[1] + robot.x;
+
+                let radius = (gridX - robot.x)**2 + (gridY - robot.y)**2;
+                if (wantsVisible) {
+                    let visionColor = (robot.team == 0) ? redVisionColor : blueVisionColor;
+                    this.grid_overlay.beginFill(visionColor, 0.5);
+                }
+
+                let attack = SPECS.UNITS[robot.unit].ATTACK_RADIUS;
+                if(attack && (attack[0] <= radius) && (radius <= attack[1]) && wantsAttackable) {
+                    let attackColor = (robot.team == 0) ? redAttackColor : blueAttackColor;
+                    this.grid_overlay.beginFill(attackColor, 0.5);
+                }
+
+                let gx = gridX * (GRID_SIZE + GRID_SPACING);
+                let gy = gridY * (GRID_SIZE + GRID_SPACING);
+                this.grid_overlay.drawRect(gx,gy,GRID_SIZE,GRID_SIZE);
+                this.grid_overlay.endFill();
+
+                let move = SPECS.UNITS[robot.unit].SPEED;
+                if(move > 0 && wantsMovable && radius <= move && this.current_game.map[gridY][gridX] && !this.current_game.shadow[gridY][gridX]) {
+                    this.dot_square(gridX, gridY);
+                }
+            }.bind(this));
+        }
     }
 
     // show what action is currently being done
@@ -842,6 +838,9 @@ class Veww {
                 var robot = this.current_game.robots[i];
 
                 if (robot.x == hx && robot.y == hy) {
+                    // render visible, attackable and movable squares
+                    this.render_grid_overlay(robot);
+
                     document.getElementById('unit_type').innerText = UNIT_NAMES[robot.unit];
                     document.getElementById('unit_id').innerText = robot.id;
 
