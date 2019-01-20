@@ -61,6 +61,9 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 
 # Version History
 
+## 1.0.3 (1/19/19)
+* show signal radius in tooltip (thanks to j-mao)
+
 ## 1.0.2 (1/19/19)
 * show movable, attackable and visible squares for a unit on hover
 
