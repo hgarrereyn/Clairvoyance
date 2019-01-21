@@ -822,10 +822,10 @@ class Veww {
 
             if (robot.team == 0) {
                 red_units += 1;
-                red_unit_value += SPECS.UNITS[robot.unit].CONSTRUCTION_KARBONITE;
+                red_unit_value += robot.health;
             } else {
                 blue_units += 1;
-                blue_unit_value += SPECS.UNITS[robot.unit].CONSTRUCTION_KARBONITE;
+                blue_unit_value += robot.health;
             }
         }
         document.getElementById('turn_queue').innerHTML = html;
@@ -1115,4 +1115,26 @@ document.getElementById('btn_switch_bc19_version').onclick = function(){
         document.getElementById('btn_switch_text').classList.remove('hidden');
         document.getElementById('btn_switch_loading').classList.add('hidden');
     });
+}
+
+document.getElementById('btn_toggle_health_bars').onclick = function(){
+    var health = document.getElementById('health');
+
+    console.log(health.style.display);
+
+    if (health.style.display == 'none') {
+        health.style.display = 'block';
+    } else {
+        health.style.display = 'none';
+    }
+}
+
+document.getElementById('btn_toggle_stat_bars').onclick = function(){
+    var stats = document.getElementById('stats');
+
+    if (stats.style.display == 'none') {
+        stats.style.display = 'block';
+    } else {
+        stats.style.display = 'none';
+    }
 }
