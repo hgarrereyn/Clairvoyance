@@ -61,6 +61,9 @@ Clairvoyance is capable of automatically reloading when the replay file changes 
 
 # Version History
 
+## 1.0.7 (1/21/19)
+* toggle autoplay with spacebar
+
 ## 1.0.6 (1/21/19)
 * change unit value bar to health bar (total health of units)
 * add ability to hide health and stat bars

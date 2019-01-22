@@ -1138,3 +1138,17 @@ document.getElementById('btn_toggle_stat_bars').onclick = function(){
         stats.style.display = 'none';
     }
 }
+
+// toggle autoplay with spacebar
+window.onkeyup = function(e) {
+    var key = e.keyCode ? e.keyCode : e.which;
+ 
+    // spacebar
+    if (key == 32) {
+        if (veww.is_playing) {
+            veww.stop_autoplay();
+        } else {
+            veww.start_autoplay();
+        }
+    }
+}
